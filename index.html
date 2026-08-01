@@ -1008,12 +1008,12 @@
       <button class="close-btn" onclick="toggleSettings()">✕</button>
       <h2>⚙️ Settings</h2>
       <p class="subtitle">
-        Enter your Google Gemini API key. It's stored only in your browser and sent directly to Google's API. 
-        <a href="https://aistudio.google.com/app/apikey" target="_blank">Get a free key →</a>
+        Enter your OpenRouter API key. It's stored only in your browser and grants access to completely free models.
+        <a href="https://openrouter.ai/keys" target="_blank">Get a free key →</a>
       </p>
       <div class="form-group">
-        <label>Gemini API Key</label>
-        <input class="form-input" id="apiKeyInput" type="password" placeholder="AIzaSy…">
+        <label>OpenRouter API Key</label>
+        <input class="form-input" id="apiKeyInput" type="password" placeholder="sk-or-v1-…">
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <span class="key-status" id="keyStatus"></span>
@@ -1048,8 +1048,10 @@
     var gradingResults = [];
 
     // ── Init ──
-    updateKeyStatus();
-    renderHistory();
+    window.addEventListener('DOMContentLoaded', () => {
+      updateKeyStatus();
+      renderHistory();
+    });
 
     // ── Screen Management ──
     function showScreen(id) {
@@ -1063,20 +1065,20 @@
       const overlay = document.getElementById('settingsOverlay');
       overlay.classList.toggle('show');
       if (overlay.classList.contains('show')) {
-        const saved = localStorage.getItem('jschool_api_key') || '';
+        const saved = localStorage.getItem('jschool_openrouter_key') || '';
         document.getElementById('apiKeyInput').value = saved;
       }
     }
     function saveApiKey() {
       const key = document.getElementById('apiKeyInput').value.trim();
       if (!key) { toast('Please enter an API key', true); return; }
-      localStorage.setItem('jschool_api_key', key);
+      localStorage.setItem('jschool_openrouter_key', key);
       updateKeyStatus();
       toggleSettings();
       toast('API key saved ✓');
     }
     function getApiKey() {
-      return localStorage.getItem('jschool_api_key') || '';
+      return localStorage.getItem('jschool_openrouter_key') || '';
     }
     function updateKeyStatus() {
       const el = document.getElementById('keyStatus');
@@ -1127,10 +1129,9 @@
     async function handleFile(file) {
       if (!getApiKey()) {
         toggleSettings();
-        toast('Please set your Gemini API key first', true);
+        toast('Please set your OpenRouter API key first', true);
         return;
       }
-
 
       pdfFileName = file.name;
       document.getElementById('fileName').textContent = file.name;
@@ -1185,7 +1186,7 @@
       }
     }
 
-    // ── Quiz Generation (Gemini API) ──
+    // ── Quiz Generation (OpenRouter API) ──
     async function generateQuiz() {
       const apiKey = getApiKey();
       if (!apiKey) { toggleSettings(); toast('Set your API key first', true); return; }
@@ -1197,10 +1198,10 @@
       const diff = document.getElementById('difficulty').value;
       const focus = document.getElementById('focusArea').value.trim();
 
-      // Truncate text if too long (keep ~30k chars to stay within token limits)
+      // Truncate text if too long (keep ~25k chars to stay within token limits of free models)
       let sourceText = extractedText;
-      if (sourceText.length > 30000) {
-        sourceText = sourceText.substring(0, 30000) + '\n[... content truncated for length ...]';
+      if (sourceText.length > 25000) {
+        sourceText = sourceText.substring(0, 25000) + '\n[... content truncated for length ...]';
       }
 
       let typeInstructions = '';
@@ -1266,7 +1267,7 @@ INSTRUCTIONS:
 }`;
 
       try {
-        const response = await callGemini(apiKey, prompt);
+        const response = await callOpenRouter(apiKey, prompt);
         const parsed = parseJsonResponse(response);
 
         if (!parsed || !parsed.questions || parsed.questions.length === 0) {
@@ -1287,20 +1288,26 @@ INSTRUCTIONS:
       }
     }
 
-    // ── Gemini API Call ──
-    async function callGemini(apiKey, prompt) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    // ── OpenRouter API Call ──
+    async function callOpenRouter(apiKey, prompt) {
+      const url = `https://openrouter.ai/api/v1/chat/completions`;
       const body = {
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.3,
-          maxOutputTokens: 8192
-        }
+        model: "meta-llama/llama-3.3-70b-instruct:free",
+        messages: [
+          { role: "system", content: "You are a precise JSON-generating assistant. ALWAYS reply with only raw, valid JSON." },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.2
       };
 
       const res = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'HTTP-Referer': window.location.origin, 
+          'X-Title': 'JSchool Exam Prep'
+        },
         body: JSON.stringify(body)
       });
 
@@ -1311,7 +1318,7 @@ INSTRUCTIONS:
       }
 
       const data = await res.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      return data.choices?.[0]?.message?.content || '';
     }
 
     function parseJsonResponse(text) {
@@ -1319,6 +1326,12 @@ INSTRUCTIONS:
       let cleaned = text.trim();
       if (cleaned.startsWith('```')) {
         cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
+      }
+      // Attempt to extract json object if model included extra text
+      const firstBrace = cleaned.indexOf('{');
+      const lastBrace = cleaned.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace !== -1) {
+        cleaned = cleaned.substring(firstBrace, lastBrace + 1);
       }
       return JSON.parse(cleaned);
     }
@@ -1364,11 +1377,10 @@ INSTRUCTIONS:
       document.getElementById('btnNext').textContent = isLast ? '✓ Submit Quiz' : 'Next →';
     }
 
-    window.selectMcOption = function(qIndex, value) {
+    function selectMcOption(qIndex, value) {
       userAnswers[qIndex] = value;
       renderQuestion();
     };
-
 
     function navQuestion(dir) {
       if (dir === 1 && currentQ === quizData.length - 1) {
@@ -1413,7 +1425,7 @@ INSTRUCTIONS:
         }
       });
 
-      // Grade short-answer via Gemini (batch them)
+      // Grade short-answer via OpenRouter (batch them)
       if (shortAnswerIndices.length > 0 && apiKey) {
         try {
           const saItems = shortAnswerIndices.map(i => ({
@@ -1429,18 +1441,18 @@ For each answer, respond with a JSON array in this exact format (no markdown, no
 [
   {
     "id": 1,
-    "score": 0.0 to 1.0,
-    "correct": true/false,
+    "score": 0.0,
+    "correct": false,
     "feedback": "Brief feedback explaining the grade"
   }
 ]
 
-Score guide: 1.0 = fully correct, 0.5 = partially correct, 0.0 = incorrect or not answered.
+Score guide: 1.0 = fully correct, 0.5 = partially correct, 0.0 = incorrect or not answered. Ensure your output is purely the JSON array.
 
 ANSWERS TO GRADE:
 ${JSON.stringify(saItems, null, 2)}`;
 
-          const gradeResponse = await callGemini(apiKey, gradingPrompt);
+          const gradeResponse = await callOpenRouter(apiKey, gradingPrompt);
           const grades = parseJsonResponse(gradeResponse);
 
           grades.forEach(g => {
@@ -1583,7 +1595,6 @@ ${JSON.stringify(saItems, null, 2)}`;
     // ── Retake / New ──
     function retakeQuiz() {
       userAnswers = new Array(quizData.length).fill(null);
-      window.userAnswers = userAnswers;
       currentQ = 0;
       showScreen('quiz');
       renderQuestion();
