@@ -927,8 +927,13 @@
       var savedName = localStorage.getItem('jschool_pdf_name');
       var savedText = localStorage.getItem('jschool_pdf_text');
       if (savedName && savedText) {
+        extractedText = savedText;
+        pdfFileName = savedName;
+        pdfLoaded = true;
         document.getElementById('resumeContainer').style.display = 'block';
         document.getElementById('resumeFileName').textContent = savedName;
+        document.getElementById('docName').textContent = savedName;
+        var adn = document.getElementById('askDocName'); if (adn) adn.textContent = savedName;
       }
       loadChatHistory();
     });
@@ -1076,7 +1081,7 @@
 
     // ── Quiz Gen ──
     async function generateQuiz() {
-      var apiKey = getApiKey(); if (!apiKey) { toggleSettings(); return; }
+      var apiKey = getApiKey(); if (!apiKey) { showScreen('settings'); toast('Please set your API key first', true); return; }
       showScreen('generating');
       document.getElementById('genTitle').textContent = 'Crafting Your Quiz…';
       document.getElementById('genStatus').textContent = 'Analyzing material for exam-style questions';
@@ -1102,7 +1107,7 @@
 
     // ── Flashcard Gen ──
     async function generateFlashcards() {
-      var apiKey = getApiKey(); if (!apiKey) { toggleSettings(); return; }
+      var apiKey = getApiKey(); if (!apiKey) { showScreen('settings'); toast('Please set your API key first', true); return; }
       showScreen('generating');
       document.getElementById('genTitle').textContent = 'Building Flashcards…';
       document.getElementById('genStatus').textContent = 'Extracting key concepts from your material';
@@ -1336,7 +1341,7 @@
       saveChatHistory();
 
       var src = getSourceText(12000);
-      var sysPrompt = 'You are a helpful, friendly course tutor. Answer the student\\'s question using ONLY the document content below. If the answer isn\\'t in the document, say so honestly. Be concise but thorough. Use simple language.\\n\\nDOCUMENT:\\n"""\\n' + src + '"""';
+      var sysPrompt = 'You are a helpful, friendly course tutor. Answer the student\'s question using ONLY the document content below. If the answer isn\'t in the document, say so honestly. Be concise but thorough. Use simple language.\n\nDOCUMENT:\n"""\n' + src + '"""';
 
       try {
         var response = await callOpenRouter(apiKey, q, sysPrompt);
