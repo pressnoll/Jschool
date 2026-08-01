@@ -343,7 +343,7 @@
 
     .fc-scene { perspective: 1000px; margin: 16px 0; }
     .fc-card {
-      width: 100%; min-height: 280px; position: relative;
+      width: 100%; height: 380px; position: relative;
       transform-style: preserve-3d;
       transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
       cursor: pointer;
@@ -351,10 +351,13 @@
     .fc-card.flipped { transform: rotateY(180deg); }
     .fc-face {
       position: absolute; inset: 0; backface-visibility: hidden;
-      border-radius: var(--radius); padding: 32px 28px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      text-align: center;
+      border-radius: var(--radius); padding: 24px 24px 44px 24px;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; overflow-y: auto;
+      scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent;
     }
+    .fc-face::-webkit-scrollbar { width: 5px; }
+    .fc-face::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
     .fc-front {
       background: var(--bg-elevated); border: 1px solid var(--glass-border);
       box-shadow: var(--shadow-lg);
@@ -366,19 +369,23 @@
     }
     .fc-side-label {
       font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 1.2px; margin-bottom: 14px;
+      letter-spacing: 1.2px; margin-bottom: 14px; flex-shrink: 0;
     }
     .fc-front .fc-side-label { color: var(--accent-light); opacity: 0.6; }
     .fc-back .fc-side-label { color: var(--correct); opacity: 0.6; }
-    .fc-text { font-size: 1.05rem; font-weight: 500; line-height: 1.7; }
+    .fc-text {
+      font-size: 0.98rem; font-weight: 500; line-height: 1.65;
+      margin: auto 0; width: 100%; word-break: break-word;
+    }
     .fc-topic-tag {
-      margin-top: 14px; padding: 3px 10px; border-radius: 10px;
-      background: rgba(255,255,255,0.04); font-size: 0.68rem;
-      color: var(--text-muted); font-weight: 500;
+      margin-top: 14px; padding: 4px 12px; border-radius: 12px;
+      background: rgba(255,255,255,0.05); font-size: 0.7rem;
+      color: var(--text-muted); font-weight: 500; flex-shrink: 0;
     }
     .fc-hint {
-      position: absolute; bottom: 14px; font-size: 0.68rem;
-      color: var(--text-muted); opacity: 0.4;
+      position: sticky; bottom: -24px; margin-top: auto; padding: 8px 0 0 0;
+      background: var(--bg-elevated); width: 100%; text-align: center;
+      font-size: 0.68rem; color: var(--text-muted); opacity: 0.5; flex-shrink: 0;
     }
     .fc-actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
     .fc-actions .btn { min-width: 150px; justify-content: center; }
@@ -638,13 +645,97 @@
     }
     .sidebar-overlay.show { display: block; opacity: 1; }
     
-    /* Full chat adjustments */
-    .ask-msg { max-width: 85%; padding: 12px 16px; border-radius: 12px; font-size: 0.9rem; line-height: 1.55; word-wrap: break-word; }
-    .ask-msg.user { align-self: flex-end; background: var(--accent-soft); color: var(--text-primary); border-bottom-right-radius: 4px; }
-    .ask-msg.tutor { align-self: flex-start; background: var(--bg-card); color: var(--text-secondary); border-bottom-left-radius: 4px; }
-    .ask-msg.tutor strong { color: var(--text-primary); }
-    .ask-msg.typing { color: var(--text-muted); font-style: italic; }
-    .ask-empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 20px; }
+    /* ── ChatGPT Style Ask Tutor ── */
+    .ask-chat-container {
+      display: flex; flex-direction: column;
+      height: calc(100vh - 110px); max-height: 820px;
+      padding: 0 !important; overflow: hidden;
+    }
+    .ask-header {
+      padding: 14px 20px; border-bottom: 1px solid var(--glass-border);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      background: rgba(0,0,0,0.25); flex-shrink: 0;
+    }
+    .ask-header-left { display: flex; align-items: center; gap: 12px; }
+    .tutor-avatar-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--accent-gradient); display: flex;
+      align-items: center; justify-content: center; font-size: 1.2rem;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+    .tutor-status-subtitle { font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--correct); display: inline-block; box-shadow: 0 0 8px var(--correct); }
+    .ask-header-right { display: flex; align-items: center; gap: 10px; }
+
+    .ask-messages {
+      flex: 1; overflow-y: auto; padding: 20px; display: flex;
+      flex-direction: column; gap: 18px; scroll-behavior: smooth;
+    }
+    .ask-welcome { text-align: center; max-width: 480px; margin: auto; padding: 20px 0; }
+    .welcome-icon { font-size: 2.8rem; margin-bottom: 12px; }
+    .ask-welcome h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 6px; }
+    .ask-welcome p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; }
+    .quick-prompts { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .prompt-chip {
+      background: var(--bg-card); border: 1px solid var(--glass-border);
+      color: var(--text-secondary); padding: 8px 14px; border-radius: 20px;
+      font-size: 0.78rem; cursor: pointer; transition: var(--transition);
+      font-family: inherit;
+    }
+    .prompt-chip:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--text-primary); transform: translateY(-1px); }
+
+    .chat-row { display: flex; gap: 12px; max-width: 90%; width: 100%; }
+    .chat-row.user-row { margin-left: auto; justify-content: flex-end; }
+    .chat-row.tutor-row { margin-right: auto; justify-content: flex-start; }
+    
+    .chat-avatar {
+      width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 700;
+    }
+    .tutor-avatar { background: var(--accent-soft); border: 1px solid hsla(var(--accent-h),75%,60%,0.2); color: var(--accent-light); }
+    .user-avatar { background: var(--bg-surface-2); border: 1px solid var(--glass-border); color: var(--text-secondary); }
+
+    .chat-bubble {
+      padding: 12px 18px; border-radius: 16px; font-size: 0.88rem; line-height: 1.65;
+      word-wrap: break-word; max-width: 100%;
+    }
+    .user-row .chat-bubble {
+      background: var(--accent-gradient); color: white;
+      border-bottom-right-radius: 4px; box-shadow: 0 4px 14px rgba(108,92,231,0.25);
+    }
+    .tutor-row .chat-bubble {
+      background: var(--bg-surface); border: 1px solid var(--glass-border);
+      color: var(--text-primary); border-bottom-left-radius: 4px;
+    }
+    .chat-bubble p { margin-bottom: 8px; }
+    .chat-bubble p:last-child { margin-bottom: 0; }
+    .chat-bubble ul, .chat-bubble ol { margin: 8px 0 8px 20px; }
+    .chat-bubble li { margin-bottom: 4px; }
+    .chat-bubble code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; }
+
+    .ask-input-wrapper {
+      padding: 16px 20px; border-top: 1px solid var(--glass-border);
+      background: var(--bg-surface); flex-shrink: 0;
+    }
+    .ask-input-box {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg-primary); border: 1px solid var(--glass-border);
+      border-radius: 24px; padding: 6px 8px 6px 18px; transition: var(--transition);
+    }
+    .ask-input-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .ask-input-box textarea {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: var(--text-primary); font-family: inherit; font-size: 0.9rem;
+      resize: none; max-height: 120px; line-height: 1.5; padding: 6px 0;
+    }
+    .ask-send-btn {
+      width: 38px; height: 38px; border-radius: 50%; background: var(--accent-gradient);
+      border: none; color: white; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: var(--transition); flex-shrink: 0;
+    }
+    .ask-send-btn:hover { transform: scale(1.05); filter: brightness(1.1); }
+    .ask-send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .ask-disclaimer { text-align: center; font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; }
     
     @media (max-width: 768px) {
       .sidebar { position: fixed; top: 0; left: 0; bottom: 0; transform: translateX(-100%); }
@@ -652,7 +743,8 @@
       .mobile-header { display: flex; }
       .mobile-close { display: block; }
       .app-container { padding: 20px 16px 100px; }
-      #screenAskTutor .card { height: calc(100vh - 150px) !important; }
+      .ask-chat-container { height: calc(100vh - 100px) !important; }
+      .chat-row { max-width: 95%; }
     }
   </style>
 </head>
@@ -876,18 +968,46 @@
     </section>
       <!-- ASK TUTOR PAGE -->
       <section class="screen" id="screenAskTutor">
-        <div class="card card-glow" style="display:flex; flex-direction:column; height: calc(100vh - 120px); padding:0; overflow:hidden;">
-          <div class="ask-header" style="padding: 16px 20px; border-bottom: 1px solid var(--glass-border); display:flex; align-items:center; gap: 12px; background: rgba(0,0,0,0.2);">
-            <h2 style="font-size:1.1rem;">💬 Ask Your Tutor</h2>
-            <div class="doc-badge" style="font-size:0.65rem; padding: 4px 10px;">📄 <span id="askDocName">No PDF loaded</span></div>
+        <div class="card card-glow ask-chat-container">
+          <div class="ask-header">
+            <div class="ask-header-left">
+              <div class="tutor-avatar-icon">🤖</div>
+              <div>
+                <h2 style="font-size:1.05rem; font-weight:700;">AI Tutor</h2>
+                <div class="tutor-status-subtitle">
+                  <span class="status-dot"></span> <span id="tutorModeStatus">Ready · PDF & General Knowledge</span>
+                </div>
+              </div>
+            </div>
+            <div class="ask-header-right">
+              <div class="doc-badge" id="askDocBadge">📄 <span id="askDocName">General Mode (No PDF)</span></div>
+              <button class="btn btn-ghost" onclick="clearChat()" title="Clear Chat History" style="font-size:0.8rem; padding: 6px 10px;">🗑 Clear</button>
+            </div>
           </div>
-          <div class="ask-messages" id="askMessages" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:16px;">
-            <div class="ask-empty">Ask anything about your material — definitions, explanations, examples…</div>
+
+          <div class="ask-messages" id="askMessages">
+            <div class="ask-empty" id="askEmptyState">
+              <div class="ask-welcome">
+                <div class="welcome-icon">💬</div>
+                <h3>Ask Your AI Tutor Anything</h3>
+                <p>Ground answers in your course PDF or ask any general academic questions!</p>
+                <div class="quick-prompts">
+                  <button class="prompt-chip" onclick="sendQuickPrompt('Explain the key concepts of this material')">💡 Key Concepts</button>
+                  <button class="prompt-chip" onclick="sendQuickPrompt('Give me a quick summary of the main points')">📝 Quick Summary</button>
+                  <button class="prompt-chip" onclick="sendQuickPrompt('What are some real-world applications of this topic?')">🌐 Real-World Examples</button>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="ask-input-row" style="padding: 16px; border-top: 1px solid var(--glass-border); background: var(--bg-surface-2); display:flex; gap:10px;">
-            <input type="text" id="askInput" placeholder="What does entropy mean?" onkeydown="if(event.key==='Enter')askQuestion()" style="flex:1; padding:12px 16px; background:var(--bg-primary); border:1px solid var(--glass-border); border-radius:var(--radius-sm); color:var(--text-primary); outline:none;">
-            <button class="btn btn-primary" id="askSendBtn" onclick="askQuestion()" style="padding: 0 24px;">Ask</button>
-            <button class="btn btn-ghost" onclick="clearChat()" style="padding: 0 16px;" title="Clear Chat">🗑</button>
+
+          <div class="ask-input-wrapper">
+            <div class="ask-input-box">
+              <textarea id="askInput" placeholder="Ask anything about your material or any general concept…" rows="1" onkeydown="handleAskKeyDown(event)"></textarea>
+              <button class="ask-send-btn" id="askSendBtn" onclick="askQuestion()" title="Send message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              </button>
+            </div>
+            <div class="ask-disclaimer">Tutor provides answers grounded in your PDF and general LLM knowledge.</div>
           </div>
         </div>
       </section>
@@ -1055,17 +1175,43 @@
 
     // ── OpenRouter ──
     async function callOpenRouter(apiKey, prompt, sys) {
-      var res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey, 'HTTP-Referer': window.location.origin, 'X-Title': 'JSchool' },
-        body: JSON.stringify({
-          model: 'openrouter/free',
-          messages: [{ role: 'system', content: sys || 'You are a precise JSON-generating assistant. ALWAYS reply with only raw, valid JSON. No markdown, no code fences.' }, { role: 'user', content: prompt }],
-          temperature: 0.3
-        })
-      });
-      if (!res.ok) { var e = await res.json().catch(() => ({})); throw new Error(e?.error?.message || 'API Error ' + res.status); }
-      var d = await res.json(); return d.choices?.[0]?.message?.content || '';
+      var models = [
+        'openrouter/free',
+        'google/gemma-2-9b-it:free',
+        'meta-llama/llama-3.1-8b-instruct:free',
+        'qwen/qwen-2.5-7b-instruct:free',
+        'mistralai/mistral-7b-instruct:free'
+      ];
+      var lastErr = null;
+      for (var m of models) {
+        try {
+          var res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + apiKey,
+              'HTTP-Referer': window.location.origin,
+              'X-Title': 'JSchool'
+            },
+            body: JSON.stringify({
+              model: m,
+              messages: [{ role: 'system', content: sys || 'You are a precise JSON-generating assistant. ALWAYS reply with raw valid JSON.' }, { role: 'user', content: prompt }],
+              temperature: 0.3
+            })
+          });
+          if (res.ok) {
+            var d = await res.json();
+            var content = d.choices?.[0]?.message?.content;
+            if (content) return content;
+          } else {
+            var e = await res.json().catch(() => ({}));
+            lastErr = e?.error?.message || ('API Error ' + res.status);
+          }
+        } catch (err) {
+          lastErr = err.message;
+        }
+      }
+      throw new Error(lastErr || 'Unable to reach AI services. Please check network or API Key.');
     }
 
     function parseJson(text) {
@@ -1304,56 +1450,101 @@
     function saveChatHistory() {
       localStorage.setItem('jschool_chat_history', JSON.stringify(askHistory));
     }
+
+    function sendQuickPrompt(txt) {
+      var input = document.getElementById('askInput');
+      if (input) input.value = txt;
+      askQuestion();
+    }
+
+    function handleAskKeyDown(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        askQuestion();
+      }
+    }
+
+    function formatMarkdown(txt) {
+      if (!txt) return '';
+      var html = esc(txt);
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      html = html.replace(/`(.*?)`/g, '<code>$1</code>');
+      html = html.replace(/^\s*[-•]\s+(.*)$/gm, '<li>$1</li>');
+      html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+      html = html.replace(/\n\n/g, '</p><p>');
+      html = html.replace(/\n/g, '<br>');
+      return '<p>' + html + '</p>';
+    }
     
     function renderChatHistory() {
       var msgs = document.getElementById('askMessages');
       var h = '';
       askHistory.forEach(m => {
-        h += '<div class="ask-msg ' + m.role + '">' + esc(m.text) + '</div>';
+        if (m.role === 'user') {
+          h += '<div class="chat-row user-row"><div class="chat-bubble">' + esc(m.text) + '</div><div class="chat-avatar user-avatar">👤</div></div>';
+        } else {
+          h += '<div class="chat-row tutor-row"><div class="chat-avatar tutor-avatar">🤖</div><div class="chat-bubble">' + formatMarkdown(m.text) + '</div></div>';
+        }
       });
-      if (h) msgs.innerHTML = h;
+      if (h) {
+        msgs.innerHTML = h;
+        var empty = document.getElementById('askEmptyState'); if (empty) empty.style.display = 'none';
+      }
       msgs.scrollTop = msgs.scrollHeight;
-      var empty = msgs.querySelector('.ask-empty'); if (empty) empty.style.display = 'none';
     }
     
     function clearChat() {
       if (!confirm('Clear chat history?')) return;
       askHistory = [];
       saveChatHistory();
-      document.getElementById('askMessages').innerHTML = '<div class="ask-empty">Ask anything about your material — definitions, explanations, examples…</div>';
+      document.getElementById('askMessages').innerHTML = '<div class="ask-empty" id="askEmptyState"><div class="ask-welcome"><div class="welcome-icon">💬</div><h3>Ask Your AI Tutor Anything</h3><p>Ground answers in your course PDF or ask any general academic questions!</p><div class="quick-prompts"><button class="prompt-chip" onclick="sendQuickPrompt(\'Explain the key concepts of this material\')">💡 Key Concepts</button><button class="prompt-chip" onclick="sendQuickPrompt(\'Give me a quick summary of the main points\')">📝 Quick Summary</button><button class="prompt-chip" onclick="sendQuickPrompt(\'What are some real-world applications of this topic?\')">🌐 Real-World Examples</button></div></div></div>';
     }
 
     async function askQuestion() {
       var input = document.getElementById('askInput'), q = input.value.trim();
       if (!q) return;
-      if (!pdfLoaded) { toast('Please upload a PDF first in the Study Area', true); return; }
-      var apiKey = getApiKey(); if (!apiKey) { showScreen('settings'); toast('Set API key first', true); return; }
+      var apiKey = getApiKey();
+      if (!apiKey) { showScreen('settings'); toast('Please set your API key first in Settings', true); return; }
       
-      input.value = ''; input.disabled = true;
+      input.value = '';
+      input.disabled = true;
       document.getElementById('askSendBtn').disabled = true;
-      var msgs = document.getElementById('askMessages');
-      var empty = msgs.querySelector('.ask-empty'); if (empty) empty.style.display = 'none';
       
+      var msgs = document.getElementById('askMessages');
+      var emptyState = document.getElementById('askEmptyState');
+      if (emptyState) emptyState.style.display = 'none';
+
       askHistory.push({ role: 'user', text: q });
-      msgs.innerHTML += '<div class="ask-msg user">' + esc(q) + '</div>';
-      msgs.innerHTML += '<div class="ask-msg tutor typing" id="askTyping"><span class="mini-spinner"></span> Thinking…</div>';
+      
+      msgs.innerHTML += '<div class="chat-row user-row"><div class="chat-bubble">' + esc(q) + '</div><div class="chat-avatar user-avatar">👤</div></div>';
+      msgs.innerHTML += '<div class="chat-row tutor-row" id="askTyping"><div class="chat-avatar tutor-avatar">🤖</div><div class="chat-bubble typing"><span class="mini-spinner"></span> Thinking…</div></div>';
       msgs.scrollTop = msgs.scrollHeight;
       saveChatHistory();
 
-      var src = getSourceText(12000);
-      var sysPrompt = 'You are a helpful, friendly course tutor. Answer the student\'s question using ONLY the document content below. If the answer isn\'t in the document, say so honestly. Be concise but thorough. Use simple language.\n\nDOCUMENT:\n"""\n' + src + '"""';
+      var src = (pdfLoaded && extractedText) ? getSourceText(14000) : '';
+      var docContext = src ? 'DOCUMENT CONTENT:\n"""\n' + src + '\n"""\n' : '(No document loaded. Use broad general academic knowledge.)\n';
+
+      var sysPrompt = 'You are an intelligent, expert course tutor modeled after ChatGPT. You have comprehensive academic knowledge across all topics.\n\n' +
+        docContext + '\n' +
+        'INSTRUCTIONS:\n' +
+        '- Primary Focus: If a document context is provided above, ground your answers in it whenever relevant.\n' +
+        '- General Knowledge: If the user asks a question that goes beyond or is not in the document (such as general definitions, background context, real-world examples, or general academic topics), use your broad general LLM knowledge to give a complete, clear, and accurate explanation!\n' +
+        '- Tone & Style: Friendly, clear, structured, and easy to digest (like ChatGPT). Use bullet points, bolding, and clean formatting where helpful.';
 
       try {
         var response = await callOpenRouter(apiKey, q, sysPrompt);
         var typing = document.getElementById('askTyping'); if (typing) typing.remove();
         askHistory.push({ role: 'tutor', text: response });
-        msgs.innerHTML += '<div class="ask-msg tutor">' + esc(response) + '</div>';
+        msgs.innerHTML += '<div class="chat-row tutor-row"><div class="chat-avatar tutor-avatar">🤖</div><div class="chat-bubble">' + formatMarkdown(response) + '</div></div>';
         saveChatHistory();
       } catch (err) {
         var typing = document.getElementById('askTyping'); if (typing) typing.remove();
-        msgs.innerHTML += '<div class="ask-msg tutor" style="color:var(--incorrect)">Sorry, something went wrong: ' + esc(err.message) + '</div>';
+        msgs.innerHTML += '<div class="chat-row tutor-row"><div class="chat-avatar tutor-avatar">🤖</div><div class="chat-bubble" style="color:var(--incorrect)">⚠️ ' + esc(err.message) + '</div></div>';
       }
-      input.disabled = false; document.getElementById('askSendBtn').disabled = false;
+      
+      input.disabled = false;
+      document.getElementById('askSendBtn').disabled = false;
       msgs.scrollTop = msgs.scrollHeight;
       input.focus();
     }
