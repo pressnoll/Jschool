@@ -1032,51 +1032,24 @@
     <p style="color: var(--text-secondary); margin-top: 8px; font-size: 0.9rem;">Evaluating responses against the source material</p>
   </div>
 
-  <!-- PDF.js CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
-  
-  <script type="module">
-    // We can just rely on the global pdfjsLib after it's imported dynamically.
-    // To ensure compatibility, we use the standard dynamic import here instead of mutating the module export.
-    let pdfjsLib;
+  <!-- PDF.js v3 classic build — creates global pdfjsLib, no ES modules needed -->
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
 
-    async function initPDFJS() {
-      try {
-        pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs');
-        if (pdfjsLib.GlobalWorkerOptions) {
-          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
-        }
-      } catch (e) {
-        console.error("PDF.js init error:", e);
-      }
-    }
-    initPDFJS();
+  <script>
+    // ── PDF.js Setup (classic global) ──
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
     // ── State ──
-    let extractedText = '';
-    let pdfFileName = '';
-    let quizData = [];      // Array of question objects
-    let userAnswers = [];    // User's answers
-    let currentQ = 0;       // Current question index
-    let gradingResults = []; // Grading results
+    var extractedText = '';
+    var pdfFileName = '';
+    var quizData = [];
+    var userAnswers = [];
+    var currentQ = 0;
+    var gradingResults = [];
 
     // ── Init ──
-    window.addEventListener('DOMContentLoaded', () => {
-      updateKeyStatus();
-      renderHistory();
-    });
-
-    // ── Expose to global for onclick handlers ──
-    window.showScreen = showScreen;
-    window.toggleSettings = toggleSettings;
-    window.saveApiKey = saveApiKey;
-    window.generateQuiz = generateQuiz;
-    window.navQuestion = navQuestion;
-    window.finishQuiz = finishQuiz;
-    window.retakeQuiz = retakeQuiz;
-    window.newQuiz = newQuiz;
-    window.clearHistory = clearHistory;
-    window.selectMcOption = selectMcOption;
+    updateKeyStatus();
+    renderHistory();
 
     // ── Screen Management ──
     function showScreen(id) {
@@ -1158,10 +1131,6 @@
         return;
       }
 
-      if (!pdfjsLib) {
-        toast('PDF parser is still loading. Please wait a moment and try again.', true);
-        return;
-      }
 
       pdfFileName = file.name;
       document.getElementById('fileName').textContent = file.name;
@@ -1400,8 +1369,6 @@ INSTRUCTIONS:
       renderQuestion();
     };
 
-    // Make userAnswers accessible from inline oninput
-    window.userAnswers = userAnswers;
 
     function navQuestion(dir) {
       if (dir === 1 && currentQ === quizData.length - 1) {
