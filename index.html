@@ -1292,7 +1292,7 @@ INSTRUCTIONS:
     async function callOpenRouter(apiKey, prompt) {
       const url = `https://openrouter.ai/api/v1/chat/completions`;
       const body = {
-        model: "meta-llama/llama-3.3-70b-instruct:free",
+        model: "openrouter/free",
         messages: [
           { role: "system", content: "You are a precise JSON-generating assistant. ALWAYS reply with only raw, valid JSON." },
           { role: "user", content: prompt }
