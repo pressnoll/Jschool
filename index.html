@@ -597,11 +597,60 @@
     @media (max-width: 600px) {
       .upload-hero h1 { font-size: 1.8rem; }
       .card { padding: 20px; }
-      .stats-row { grid-template-columns: 1fr; }
-      .app-header { flex-direction: column; gap: 10px; }
-      .mode-selector { flex-direction: column; }
-      .ask-panel { width: calc(100vw - 32px); right: 16px; bottom: 82px; }
-      .ask-fab { bottom: 18px; right: 18px; }
+    /* ── Layout & Sidebar ── */
+    body { min-height: 100vh; overflow: hidden; }
+    .layout-wrapper { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+    
+    .sidebar {
+      width: 260px; flex-shrink: 0; background: var(--bg-surface);
+      border-right: 1px solid var(--glass-border); display: flex; flex-direction: column;
+      z-index: 100; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sidebar-header { padding: 24px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .mobile-close { display: none; background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
+    
+    .sidebar-links { padding: 10px; display: flex; flex-direction: column; gap: 4px; }
+    .side-link {
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      background: transparent; border: none; border-radius: var(--radius-sm);
+      color: var(--text-secondary); font-family: inherit; font-size: 0.9rem; font-weight: 500;
+      cursor: pointer; transition: var(--transition); text-align: left;
+    }
+    .side-link:hover { background: var(--bg-card); color: var(--text-primary); }
+    .side-link.active { background: var(--accent-soft); color: var(--accent-light); font-weight: 600; }
+    .side-link .icon { font-size: 1.1rem; }
+    
+    .main-content { flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; }
+    .mobile-header {
+      display: none; align-items: center; gap: 16px; padding: 16px 20px;
+      background: var(--bg-surface); border-bottom: 1px solid var(--glass-border);
+      position: sticky; top: 0; z-index: 90;
+    }
+    .hamburger { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
+    
+    .app-container { max-width: 900px; margin: 0 auto; padding: 30px 20px 100px; }
+    
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px); z-index: 95; opacity: 0; transition: opacity 0.3s ease;
+    }
+    .sidebar-overlay.show { display: block; opacity: 1; }
+    
+    /* Full chat adjustments */
+    .ask-msg { max-width: 85%; padding: 12px 16px; border-radius: 12px; font-size: 0.9rem; line-height: 1.55; word-wrap: break-word; }
+    .ask-msg.user { align-self: flex-end; background: var(--accent-soft); color: var(--text-primary); border-bottom-right-radius: 4px; }
+    .ask-msg.tutor { align-self: flex-start; background: var(--bg-card); color: var(--text-secondary); border-bottom-left-radius: 4px; }
+    .ask-msg.tutor strong { color: var(--text-primary); }
+    .ask-msg.typing { color: var(--text-muted); font-style: italic; }
+    .ask-empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 20px; }
+    
+    @media (max-width: 768px) {
+      .sidebar { position: fixed; top: 0; left: 0; bottom: 0; transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .mobile-header { display: flex; }
+      .mobile-close { display: block; }
+      .app-container { padding: 20px 16px 100px; }
+      #screenAskTutor .card { height: calc(100vh - 150px) !important; }
     }
   </style>
 </head>
@@ -610,17 +659,39 @@
   <div class="ambient-orb orb-2"></div>
   <div class="ambient-orb orb-3"></div>
 
-  <div class="app-container">
-    <header class="app-header">
-      <div class="logo">
-        <div class="logo-mark">📚</div>
-        <span>JSchool</span>
+  <div class="layout-wrapper">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-mark">📚</div>
+          <span>JSchool</span>
+        </div>
+        <button class="mobile-close" onclick="toggleSidebar()">✕</button>
       </div>
-      <div class="header-actions">
-        <button class="btn" onclick="showScreen('history')">📊 History</button>
-        <button class="btn" onclick="toggleSettings()">⚙️</button>
+      <div class="sidebar-links">
+        <button class="side-link active" id="linkStudy" onclick="showScreen('upload', this)">
+          <span class="icon">🏠</span> Study Area
+        </button>
+        <button class="side-link" id="linkAsk" onclick="showScreen('askTutor', this)">
+          <span class="icon">💬</span> Ask Tutor
+        </button>
+        <button class="side-link" id="linkHistory" onclick="showScreen('history', this)">
+          <span class="icon">📊</span> History
+        </button>
+        <button class="side-link" id="linkSettings" onclick="showScreen('settings', this)">
+          <span class="icon">⚙️</span> Settings
+        </button>
       </div>
-    </header>
+    </nav>
+
+    <main class="main-content">
+      <header class="mobile-header">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <div class="logo" style="font-size:1.1rem;"><div class="logo-mark" style="width:28px;height:28px;font-size:0.8rem">📚</div><span>JSchool</span></div>
+      </header>
+
+      <div class="app-container">
 
     <!-- UPLOAD -->
     <section class="screen active" id="screenUpload">
@@ -801,37 +872,39 @@
         </div>
       </div>
     </section>
-  </div>
+      <!-- ASK TUTOR PAGE -->
+      <section class="screen" id="screenAskTutor">
+        <div class="card card-glow" style="display:flex; flex-direction:column; height: calc(100vh - 120px); padding:0; overflow:hidden;">
+          <div class="ask-header" style="padding: 16px 20px; border-bottom: 1px solid var(--glass-border); display:flex; align-items:center; gap: 12px; background: rgba(0,0,0,0.2);">
+            <h2 style="font-size:1.1rem;">💬 Ask Your Tutor</h2>
+            <div class="doc-badge" style="font-size:0.65rem; padding: 4px 10px;">📄 <span id="askDocName">No PDF loaded</span></div>
+          </div>
+          <div class="ask-messages" id="askMessages" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:16px;">
+            <div class="ask-empty">Ask anything about your material — definitions, explanations, examples…</div>
+          </div>
+          <div class="ask-input-row" style="padding: 16px; border-top: 1px solid var(--glass-border); background: var(--bg-surface-2); display:flex; gap:10px;">
+            <input type="text" id="askInput" placeholder="What does entropy mean?" onkeydown="if(event.key==='Enter')askQuestion()" style="flex:1; padding:12px 16px; background:var(--bg-primary); border:1px solid var(--glass-border); border-radius:var(--radius-sm); color:var(--text-primary); outline:none;">
+            <button class="btn btn-primary" id="askSendBtn" onclick="askQuestion()" style="padding: 0 24px;">Ask</button>
+            <button class="btn btn-ghost" onclick="clearChat()" style="padding: 0 16px;" title="Clear Chat">🗑</button>
+          </div>
+        </div>
+      </section>
 
-  <!-- Settings Modal -->
-  <div class="modal-overlay" id="settingsOverlay">
-    <div class="modal">
-      <button class="close-btn" onclick="toggleSettings()">✕</button>
-      <h2>⚙️ Settings</h2>
-      <p class="subtitle">Enter your OpenRouter API key. Stored locally. <a href="https://openrouter.ai/keys" target="_blank">Get a free key →</a></p>
-      <div class="form-group"><label>API Key</label><input class="form-input" id="apiKeyInput" type="password" placeholder="sk-or-v1-…"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span class="key-status" id="keyStatus"></span>
-        <button class="btn btn-primary" onclick="saveApiKey()">Save</button>
-      </div>
+      <!-- SETTINGS PAGE -->
+      <section class="screen" id="screenSettings">
+        <div class="card card-glow" style="max-width: 500px; margin: 0 auto;">
+          <h2 style="font-size:1.2rem; margin-bottom: 8px;">⚙️ Settings</h2>
+          <p class="subtitle" style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:24px;">Enter your OpenRouter API key. Stored locally. <a href="https://openrouter.ai/keys" target="_blank" style="color:var(--accent-light);">Get a free key →</a></p>
+          <div class="form-group"><label>API Key</label><input class="form-input" id="apiKeyInput" type="password" placeholder="sk-or-v1-…"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center; margin-top:16px;">
+            <span class="key-status" id="keyStatus"></span>
+            <button class="btn btn-primary" onclick="saveApiKey()">Save</button>
+          </div>
+        </div>
+      </section>
     </div>
-  </div>
-
-  <!-- Ask Tutor FAB + Panel -->
-  <button class="ask-fab" id="askFab" onclick="toggleAskPanel()" title="Ask your tutor">💬</button>
-  <div class="ask-panel" id="askPanel">
-    <div class="ask-panel-header">
-      <h4>💬 Ask Your Tutor</h4>
-      <span>Grounded in your PDF</span>
-    </div>
-    <div class="ask-messages" id="askMessages">
-      <div class="ask-empty">Ask anything about your material — definitions, explanations, examples…</div>
-    </div>
-    <div class="ask-input-row">
-      <input type="text" id="askInput" placeholder="e.g. What does entropy mean?" onkeydown="if(event.key==='Enter')askQuestion()">
-      <button class="ask-send" id="askSendBtn" onclick="askQuestion()">Ask</button>
-    </div>
-  </div>
+  </main>
+</div>
 
   <div class="toast" id="toast"></div>
 
@@ -855,6 +928,7 @@
         document.getElementById('resumeContainer').style.display = 'block';
         document.getElementById('resumeFileName').textContent = savedName;
       }
+      loadChatHistory();
     });
 
     function resumeSession() {
@@ -862,15 +936,38 @@
       pdfFileName = localStorage.getItem('jschool_pdf_name');
       pdfLoaded = true;
       document.getElementById('docName').textContent = pdfFileName;
-      document.getElementById('askFab').classList.add('visible');
+      var adn = document.getElementById('askDocName'); if (adn) adn.textContent = pdfFileName;
       showScreen('config');
     }
 
     // ── Screens ──
-    function showScreen(id) {
+    function showScreen(id, linkEl) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       var s = document.getElementById('screen' + id.charAt(0).toUpperCase() + id.slice(1));
       if (s) s.classList.add('active');
+      
+      // Update sidebar links
+      document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
+      if (linkEl) {
+        linkEl.classList.add('active');
+      } else {
+        var map = { 'upload': 'linkStudy', 'config': 'linkStudy', 'quiz': 'linkStudy', 'flashcards': 'linkStudy', 'results': 'linkStudy', 'history': 'linkHistory', 'settings': 'linkSettings', 'askTutor': 'linkAsk' };
+        var l = document.getElementById(map[id]);
+        if (l) l.classList.add('active');
+      }
+      
+      if (id === 'settings') {
+        document.getElementById('apiKeyInput').value = localStorage.getItem('jschool_openrouter_key') || '';
+      }
+      
+      // Close sidebar on mobile if open
+      var sb = document.getElementById('sidebar'); if (sb) sb.classList.remove('open');
+      var so = document.getElementById('sidebarOverlay'); if (so) so.classList.remove('show');
+    }
+    
+    function toggleSidebar() {
+      var sb = document.getElementById('sidebar'); if (sb) sb.classList.toggle('open');
+      var so = document.getElementById('sidebarOverlay'); if (so) so.classList.toggle('show');
     }
 
     // ── Mode ──
@@ -885,14 +982,10 @@
     function startSession() { studyMode === 'quiz' ? generateQuiz() : generateFlashcards(); }
 
     // ── Settings ──
-    function toggleSettings() {
-      var o = document.getElementById('settingsOverlay'); o.classList.toggle('show');
-      if (o.classList.contains('show')) document.getElementById('apiKeyInput').value = localStorage.getItem('jschool_openrouter_key') || '';
-    }
     function saveApiKey() {
       var k = document.getElementById('apiKeyInput').value.trim();
       if (!k) { toast('Enter an API key', true); return; }
-      localStorage.setItem('jschool_openrouter_key', k); updateKeyStatus(); toggleSettings(); toast('Key saved ✓');
+      localStorage.setItem('jschool_openrouter_key', k); updateKeyStatus(); toast('Key saved ✓');
     }
     function getApiKey() { return localStorage.getItem('jschool_openrouter_key') || ''; }
     function updateKeyStatus() {
@@ -918,7 +1011,7 @@
     });
 
     async function handleFile(file) {
-      if (!getApiKey()) { toggleSettings(); toast('Set your API key first', true); return; }
+      if (!getApiKey()) { showScreen('settings'); toast('Set your API key first', true); return; }
       pdfFileName = file.name;
       document.getElementById('fileName').textContent = file.name;
       var fileInfoEl = document.getElementById('fileInfo'), progressEl = document.getElementById('extractionProgress');
@@ -946,7 +1039,7 @@
         localStorage.setItem('jschool_pdf_name', pdfFileName);
         document.getElementById('resumeContainer').style.display = 'block';
         document.getElementById('resumeFileName').textContent = pdfFileName;
-        document.getElementById('askFab').classList.add('visible');
+        var adn = document.getElementById('askDocName'); if (adn) adn.textContent = pdfFileName;
         setTimeout(() => { document.getElementById('docName').textContent = pdfFileName; showScreen('config'); }, 700);
       } catch (err) { console.error(err); toast('Failed: ' + err.message, true); progressEl.classList.remove('show'); }
     }
@@ -1192,33 +1285,63 @@
     function toggleNote(el) { el.classList.toggle('open'); }
 
     // ── Ask Tutor ──
-    function toggleAskPanel() {
-      document.getElementById('askPanel').classList.toggle('show');
-      if (document.getElementById('askPanel').classList.contains('show')) document.getElementById('askInput').focus();
+    function loadChatHistory() {
+      try {
+        askHistory = JSON.parse(localStorage.getItem('jschool_chat_history') || '[]');
+        if (askHistory.length > 0) {
+          renderChatHistory();
+        }
+      } catch (e) { askHistory = []; }
     }
+    
+    function saveChatHistory() {
+      localStorage.setItem('jschool_chat_history', JSON.stringify(askHistory));
+    }
+    
+    function renderChatHistory() {
+      var msgs = document.getElementById('askMessages');
+      var h = '';
+      askHistory.forEach(m => {
+        h += '<div class="ask-msg ' + m.role + '">' + esc(m.text) + '</div>';
+      });
+      if (h) msgs.innerHTML = h;
+      msgs.scrollTop = msgs.scrollHeight;
+      var empty = msgs.querySelector('.ask-empty'); if (empty) empty.style.display = 'none';
+    }
+    
+    function clearChat() {
+      if (!confirm('Clear chat history?')) return;
+      askHistory = [];
+      saveChatHistory();
+      document.getElementById('askMessages').innerHTML = '<div class="ask-empty">Ask anything about your material — definitions, explanations, examples…</div>';
+    }
+
     async function askQuestion() {
       var input = document.getElementById('askInput'), q = input.value.trim();
-      if (!q || !pdfLoaded) return;
-      var apiKey = getApiKey(); if (!apiKey) { toast('Set API key first', true); return; }
+      if (!q) return;
+      if (!pdfLoaded) { toast('Please upload a PDF first in the Study Area', true); return; }
+      var apiKey = getApiKey(); if (!apiKey) { showScreen('settings'); toast('Set API key first', true); return; }
+      
       input.value = ''; input.disabled = true;
       document.getElementById('askSendBtn').disabled = true;
       var msgs = document.getElementById('askMessages');
-      // Clear empty state
-      var empty = msgs.querySelector('.ask-empty'); if (empty) empty.remove();
-      // Add user msg
+      var empty = msgs.querySelector('.ask-empty'); if (empty) empty.style.display = 'none';
+      
       askHistory.push({ role: 'user', text: q });
       msgs.innerHTML += '<div class="ask-msg user">' + esc(q) + '</div>';
       msgs.innerHTML += '<div class="ask-msg tutor typing" id="askTyping"><span class="mini-spinner"></span> Thinking…</div>';
       msgs.scrollTop = msgs.scrollHeight;
+      saveChatHistory();
 
       var src = getSourceText(12000);
-      var sysPrompt = 'You are a helpful, friendly course tutor. Answer the student\'s question using ONLY the document content below. If the answer isn\'t in the document, say so honestly. Be concise but thorough. Use simple language.\n\nDOCUMENT:\n"""\n' + src + '"""';
+      var sysPrompt = 'You are a helpful, friendly course tutor. Answer the student\\'s question using ONLY the document content below. If the answer isn\\'t in the document, say so honestly. Be concise but thorough. Use simple language.\\n\\nDOCUMENT:\\n"""\\n' + src + '"""';
 
       try {
         var response = await callOpenRouter(apiKey, q, sysPrompt);
         var typing = document.getElementById('askTyping'); if (typing) typing.remove();
         askHistory.push({ role: 'tutor', text: response });
         msgs.innerHTML += '<div class="ask-msg tutor">' + esc(response) + '</div>';
+        saveChatHistory();
       } catch (err) {
         var typing = document.getElementById('askTyping'); if (typing) typing.remove();
         msgs.innerHTML += '<div class="ask-msg tutor" style="color:var(--incorrect)">Sorry, something went wrong: ' + esc(err.message) + '</div>';
@@ -1238,8 +1361,7 @@
     function newQuiz() {
       extractedText = ''; pdfFileName = ''; quizData = []; userAnswers = []; currentQ = 0; gradingResults = [];
       flashcards = []; fcDeck = []; fcGotIt = []; fcStillLearning = []; pdfLoaded = false; askHistory = [];
-      document.getElementById('askFab').classList.remove('visible');
-      document.getElementById('askPanel').classList.remove('show');
+      var adn = document.getElementById('askDocName'); if (adn) adn.textContent = 'No PDF loaded';
       document.getElementById('askMessages').innerHTML = '<div class="ask-empty">Ask anything about your material — definitions, explanations, examples…</div>';
       document.getElementById('fileInfo').classList.remove('show');
       document.getElementById('extractionProgress').classList.remove('show');
