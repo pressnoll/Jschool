@@ -42,15 +42,13 @@
       line-height: 1.6;
     }
 
-    /* ── Ambient background ── */
     body::before {
       content: '';
       position: fixed;
       top: -40%; left: -20%;
       width: 80vw; height: 80vw;
       background: radial-gradient(circle, rgba(108,92,231,0.12) 0%, transparent 65%);
-      pointer-events: none;
-      z-index: 0;
+      pointer-events: none; z-index: 0;
     }
     body::after {
       content: '';
@@ -58,688 +56,475 @@
       bottom: -30%; right: -15%;
       width: 70vw; height: 70vw;
       background: radial-gradient(circle, rgba(0,206,201,0.08) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
+      pointer-events: none; z-index: 0;
     }
 
-    /* ── Layout ── */
     .app-container {
-      position: relative;
-      z-index: 1;
-      max-width: 860px;
-      margin: 0 auto;
+      position: relative; z-index: 1;
+      max-width: 860px; margin: 0 auto;
       padding: 24px 20px 80px;
     }
 
     /* ── Header ── */
     .app-header {
-      display: flex;
-      align-items: center;
+      display: flex; align-items: center;
       justify-content: space-between;
       padding: 20px 0 32px;
     }
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 800;
-      font-size: 1.5rem;
-      letter-spacing: -0.5px;
-    }
+    .logo { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.5px; }
     .logo-icon {
       width: 42px; height: 42px;
       background: linear-gradient(135deg, var(--accent), #a29bfe);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      box-shadow: 0 4px 20px var(--accent-glow);
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; box-shadow: 0 4px 20px var(--accent-glow);
     }
     .header-actions { display: flex; gap: 10px; }
 
     /* ── Buttons ── */
     .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      background: var(--bg-card);
-      color: var(--text-primary);
-      font-family: inherit;
-      font-size: 0.875rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: var(--transition);
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); background: var(--bg-card);
+      color: var(--text-primary); font-family: inherit; font-size: 0.875rem;
+      font-weight: 500; cursor: pointer; transition: var(--transition);
       backdrop-filter: blur(12px);
     }
-    .btn:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--glass-border-hover);
-      transform: translateY(-1px);
-    }
+    .btn:hover { background: var(--bg-card-hover); border-color: var(--glass-border-hover); transform: translateY(-1px); }
     .btn-primary {
       background: linear-gradient(135deg, var(--accent), #7c6cf0);
-      border-color: transparent;
-      box-shadow: 0 4px 20px var(--accent-glow);
+      border-color: transparent; box-shadow: 0 4px 20px var(--accent-glow);
     }
-    .btn-primary:hover {
-      box-shadow: 0 6px 28px var(--accent-glow);
-      transform: translateY(-2px);
+    .btn-primary:hover { box-shadow: 0 6px 28px var(--accent-glow); transform: translateY(-2px); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-lg { padding: 14px 32px; font-size: 1rem; font-weight: 600; border-radius: var(--radius); }
+    .btn-success {
+      background: linear-gradient(135deg, #00b894, #00cec9);
+      border-color: transparent; box-shadow: 0 4px 20px var(--correct-glow);
     }
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
+    .btn-success:hover { box-shadow: 0 6px 28px var(--correct-glow); transform: translateY(-2px); }
+    .btn-danger {
+      background: linear-gradient(135deg, #e17055, #ff6b81);
+      border-color: transparent; box-shadow: 0 4px 20px var(--incorrect-glow);
     }
-    .btn-lg {
-      padding: 14px 32px;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: var(--radius);
-    }
+    .btn-danger:hover { box-shadow: 0 6px 28px var(--incorrect-glow); transform: translateY(-2px); }
 
     /* ── Glass Card ── */
     .card {
-      background: var(--bg-card);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius);
-      backdrop-filter: blur(20px);
-      padding: 28px;
-      transition: var(--transition);
+      background: var(--bg-card); border: 1px solid var(--glass-border);
+      border-radius: var(--radius); backdrop-filter: blur(20px);
+      padding: 28px; transition: var(--transition);
     }
     .card + .card { margin-top: 20px; }
 
-    /* ── Sections (screens) ── */
+    /* ── Screens ── */
     .screen { display: none; }
-    .screen.active {
-      display: block;
-      animation: fadeSlideIn 0.5s ease;
-    }
-    @keyframes fadeSlideIn {
-      from { opacity: 0; transform: translateY(18px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .screen.active { display: block; animation: fadeSlideIn 0.5s ease; }
+    @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
 
     /* ── Upload Zone ── */
-    .upload-hero {
-      text-align: center;
-      padding: 32px 0 16px;
-    }
+    .upload-hero { text-align: center; padding: 32px 0 16px; }
     .upload-hero h1 {
-      font-size: 2.4rem;
-      font-weight: 800;
-      letter-spacing: -1px;
+      font-size: 2.4rem; font-weight: 800; letter-spacing: -1px;
       background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-light) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 12px;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px;
     }
-    .upload-hero p {
-      color: var(--text-secondary);
-      font-size: 1.05rem;
-      max-width: 500px;
-      margin: 0 auto;
-    }
+    .upload-hero p { color: var(--text-secondary); font-size: 1.05rem; max-width: 500px; margin: 0 auto; }
 
     .drop-zone {
-      margin-top: 32px;
-      border: 2px dashed var(--glass-border);
-      border-radius: var(--radius);
-      padding: 60px 32px;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--transition);
-      position: relative;
-      overflow: hidden;
+      margin-top: 32px; border: 2px dashed var(--glass-border);
+      border-radius: var(--radius); padding: 60px 32px;
+      text-align: center; cursor: pointer; transition: var(--transition);
+      position: relative; overflow: hidden;
     }
     .drop-zone::before {
-      content: '';
-      position: absolute;
-      inset: 0;
+      content: ''; position: absolute; inset: 0;
       background: linear-gradient(135deg, rgba(108,92,231,0.05), rgba(0,206,201,0.03));
-      opacity: 0;
-      transition: var(--transition);
+      opacity: 0; transition: var(--transition);
     }
-    .drop-zone:hover, .drop-zone.drag-over {
-      border-color: var(--accent);
-      background: rgba(108,92,231,0.06);
-    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: rgba(108,92,231,0.06); }
     .drop-zone:hover::before, .drop-zone.drag-over::before { opacity: 1; }
-
-    .drop-icon {
-      font-size: 3rem;
-      margin-bottom: 16px;
-      display: block;
-    }
-    .drop-zone h3 {
-      font-size: 1.15rem;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
+    .drop-icon { font-size: 3rem; margin-bottom: 16px; display: block; }
+    .drop-zone h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 6px; }
     .drop-zone p { color: var(--text-muted); font-size: 0.9rem; }
 
     .file-info {
-      display: none;
-      margin-top: 20px;
-      padding: 16px 20px;
-      background: rgba(108,92,231,0.08);
-      border: 1px solid rgba(108,92,231,0.2);
-      border-radius: var(--radius-sm);
-      text-align: left;
+      display: none; margin-top: 20px; padding: 16px 20px;
+      background: rgba(108,92,231,0.08); border: 1px solid rgba(108,92,231,0.2);
+      border-radius: var(--radius-sm); text-align: left;
     }
     .file-info.show { display: flex; align-items: center; gap: 14px; }
     .file-icon { font-size: 1.8rem; }
     .file-details h4 { font-size: 0.95rem; font-weight: 600; }
     .file-details p { font-size: 0.8rem; color: var(--text-secondary); }
 
-    .extraction-progress {
-      display: none;
-      margin-top: 16px;
-    }
+    .extraction-progress { display: none; margin-top: 16px; }
     .extraction-progress.show { display: block; }
-    .progress-bar-track {
-      width: 100%;
-      height: 6px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--accent), var(--correct));
-      border-radius: 3px;
-      transition: width 0.3s ease;
-    }
-    .progress-label {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      margin-top: 8px;
-    }
+    .progress-bar-track { width: 100%; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--correct)); border-radius: 3px; transition: width 0.3s ease; }
+    .progress-label { font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px; }
 
-    /* ── API Key Settings Modal ── */
+    /* ── Settings Modal ── */
     .settings-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(6px);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
+      z-index: 100; align-items: center; justify-content: center;
     }
     .settings-overlay.show { display: flex; }
     .settings-modal {
-      background: var(--bg-secondary);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius);
-      padding: 32px;
-      width: 90%;
-      max-width: 480px;
-      position: relative;
-      animation: fadeSlideIn 0.3s ease;
+      background: var(--bg-secondary); border: 1px solid var(--glass-border);
+      border-radius: var(--radius); padding: 32px; width: 90%; max-width: 480px;
+      position: relative; animation: fadeSlideIn 0.3s ease;
     }
     .settings-modal h2 { font-size: 1.3rem; margin-bottom: 8px; }
-    .settings-modal .subtitle {
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-      margin-bottom: 20px;
-      line-height: 1.5;
-    }
-    .settings-modal .subtitle a {
-      color: var(--accent-light);
-      text-decoration: none;
-    }
+    .settings-modal .subtitle { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px; line-height: 1.5; }
+    .settings-modal .subtitle a { color: var(--accent-light); text-decoration: none; }
     .settings-modal .subtitle a:hover { text-decoration: underline; }
     .close-btn {
-      position: absolute;
-      top: 16px; right: 16px;
-      background: none; border: none;
-      color: var(--text-muted);
-      font-size: 1.3rem;
-      cursor: pointer;
-      transition: var(--transition);
+      position: absolute; top: 16px; right: 16px;
+      background: none; border: none; color: var(--text-muted);
+      font-size: 1.3rem; cursor: pointer; transition: var(--transition);
     }
     .close-btn:hover { color: var(--text-primary); }
 
     /* ── Form Elements ── */
     .form-group { margin-bottom: 18px; }
     .form-group label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;
+      color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;
     }
     .form-input {
-      width: 100%;
-      padding: 12px 16px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      color: var(--text-primary);
-      font-family: inherit;
-      font-size: 0.95rem;
-      transition: var(--transition);
-      outline: none;
+      width: 100%; padding: 12px 16px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); color: var(--text-primary);
+      font-family: inherit; font-size: 0.95rem; transition: var(--transition); outline: none;
     }
-    .form-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
-    }
+    .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
     .form-input::placeholder { color: var(--text-muted); }
-
     select.form-input {
       appearance: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239898b0' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      padding-right: 40px;
-      cursor: pointer;
+      background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; cursor: pointer;
     }
-    select.form-input option {
-      background: var(--bg-secondary);
-      color: var(--text-primary);
+    select.form-input option { background: var(--bg-secondary); color: var(--text-primary); }
+
+    /* ── Mode Selector ── */
+    .mode-selector {
+      display: flex; gap: 12px; margin-bottom: 24px;
     }
+    .mode-card {
+      flex: 1; padding: 20px; border: 2px solid var(--glass-border);
+      border-radius: var(--radius); cursor: pointer; transition: var(--transition);
+      text-align: center; background: transparent;
+      font-family: inherit; color: var(--text-primary);
+    }
+    .mode-card:hover { border-color: var(--glass-border-hover); background: var(--bg-card-hover); }
+    .mode-card.active { border-color: var(--accent); background: rgba(108,92,231,0.1); }
+    .mode-card .mode-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+    .mode-card .mode-title { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+    .mode-card .mode-desc { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
 
     /* ── Quiz Config ── */
-    .config-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 24px;
-    }
+    .config-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
     .config-header .doc-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
-      background: rgba(108,92,231,0.1);
-      border: 1px solid rgba(108,92,231,0.25);
-      border-radius: 20px;
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: var(--accent-light);
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 14px; background: rgba(108,92,231,0.1);
+      border: 1px solid rgba(108,92,231,0.25); border-radius: 20px;
+      font-size: 0.82rem; font-weight: 500; color: var(--accent-light);
     }
-    .config-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
+    .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 540px) { .config-grid { grid-template-columns: 1fr; } }
-
-    .config-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 28px;
-    }
+    .config-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; }
 
     /* ── Quiz / Question ── */
-    .quiz-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-    .quiz-counter {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-    .quiz-progress {
-      width: 100%;
-      height: 4px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 2px;
-      margin-bottom: 28px;
-      overflow: hidden;
-    }
-    .quiz-progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--accent-light));
-      border-radius: 2px;
-      transition: width 0.4s ease;
-    }
+    .quiz-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .quiz-counter { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+    .quiz-progress { width: 100%; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; margin-bottom: 28px; overflow: hidden; }
+    .quiz-progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-light)); border-radius: 2px; transition: width 0.4s ease; }
     .question-type-badge {
-      display: inline-block;
-      padding: 4px 10px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      border-radius: 6px;
-      margin-bottom: 14px;
+      display: inline-block; padding: 4px 10px; font-size: 0.7rem;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px;
+      border-radius: 6px; margin-bottom: 14px;
     }
     .badge-mc { background: rgba(108,92,231,0.15); color: var(--accent-light); }
     .badge-sa { background: rgba(0,206,201,0.15); color: var(--correct); }
     .badge-tf { background: rgba(255,192,72,0.15); color: var(--warning); }
-
-    .question-text {
-      font-size: 1.15rem;
-      font-weight: 600;
-      line-height: 1.6;
-      margin-bottom: 24px;
+    .question-topic {
+      display: inline-block; padding: 3px 8px; font-size: 0.68rem;
+      font-weight: 500; border-radius: 4px; margin-left: 8px;
+      background: rgba(255,255,255,0.06); color: var(--text-muted);
     }
+    .question-text { font-size: 1.15rem; font-weight: 600; line-height: 1.6; margin-bottom: 24px; }
 
     .mc-options { display: flex; flex-direction: column; gap: 10px; }
     .mc-option {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 18px;
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: var(--transition);
-      background: transparent;
-      font-family: inherit;
-      font-size: 0.95rem;
-      color: var(--text-primary);
-      text-align: left;
-      width: 100%;
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px; border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition);
+      background: transparent; font-family: inherit; font-size: 0.95rem;
+      color: var(--text-primary); text-align: left; width: 100%;
     }
-    .mc-option:hover {
-      border-color: var(--glass-border-hover);
-      background: var(--bg-card-hover);
-    }
-    .mc-option.selected {
-      border-color: var(--accent);
-      background: rgba(108,92,231,0.1);
-    }
+    .mc-option:hover { border-color: var(--glass-border-hover); background: var(--bg-card-hover); }
+    .mc-option.selected { border-color: var(--accent); background: rgba(108,92,231,0.1); }
     .mc-option .option-letter {
-      width: 30px; height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.06);
-      font-weight: 700;
-      font-size: 0.85rem;
-      flex-shrink: 0;
-      transition: var(--transition);
+      width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; background: rgba(255,255,255,0.06);
+      font-weight: 700; font-size: 0.85rem; flex-shrink: 0; transition: var(--transition);
     }
-    .mc-option.selected .option-letter {
-      background: var(--accent);
-      color: white;
-    }
+    .mc-option.selected .option-letter { background: var(--accent); color: white; }
 
     .sa-input {
-      width: 100%;
-      padding: 14px 18px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      color: var(--text-primary);
-      font-family: inherit;
-      font-size: 0.95rem;
-      outline: none;
-      transition: var(--transition);
-      resize: vertical;
-      min-height: 100px;
+      width: 100%; padding: 14px 18px; background: rgba(255,255,255,0.03);
+      border: 1px solid var(--glass-border); border-radius: var(--radius-sm);
+      color: var(--text-primary); font-family: inherit; font-size: 0.95rem;
+      outline: none; transition: var(--transition); resize: vertical; min-height: 100px;
     }
-    .sa-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
+    .sa-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .quiz-nav { display: flex; justify-content: space-between; margin-top: 28px; }
+
+    /* ── Flashcard ── */
+    .flashcard-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .flashcard-counter { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+    .flashcard-stats {
+      display: flex; gap: 16px; font-size: 0.8rem; font-weight: 600;
+    }
+    .fc-stat-got { color: var(--correct); }
+    .fc-stat-learning { color: var(--warning); }
+
+    .flashcard-scene {
+      perspective: 1000px;
+      margin: 20px 0;
+    }
+    .flashcard {
+      width: 100%; min-height: 300px; position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    .flashcard.flipped { transform: rotateY(180deg); }
+    .flashcard-face {
+      position: absolute; inset: 0; backface-visibility: hidden;
+      border-radius: var(--radius); padding: 32px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+    }
+    .flashcard-front {
+      background: linear-gradient(145deg, rgba(108,92,231,0.12), rgba(108,92,231,0.04));
+      border: 1px solid rgba(108,92,231,0.25);
+    }
+    .flashcard-back {
+      background: linear-gradient(145deg, rgba(0,206,201,0.12), rgba(0,206,201,0.04));
+      border: 1px solid rgba(0,206,201,0.25);
+      transform: rotateY(180deg);
+    }
+    .fc-label {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 16px; opacity: 0.6;
+    }
+    .fc-front-label { color: var(--accent-light); }
+    .fc-back-label { color: var(--correct); }
+    .fc-content { font-size: 1.1rem; font-weight: 500; line-height: 1.7; }
+    .fc-topic {
+      margin-top: 16px; padding: 4px 12px; border-radius: 12px;
+      background: rgba(255,255,255,0.06); font-size: 0.72rem;
+      color: var(--text-muted); font-weight: 500;
+    }
+    .fc-tap-hint {
+      position: absolute; bottom: 16px; font-size: 0.72rem;
+      color: var(--text-muted); opacity: 0.5;
     }
 
-    .quiz-nav {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 28px;
+    .flashcard-actions {
+      display: flex; gap: 12px; justify-content: center; margin-top: 24px;
+    }
+    .flashcard-actions .btn { min-width: 160px; justify-content: center; }
+
+    .fc-complete {
+      text-align: center; padding: 40px 20px;
+    }
+    .fc-complete h2 { font-size: 1.6rem; margin-bottom: 8px; }
+    .fc-complete p { color: var(--text-secondary); margin-bottom: 24px; }
+    .fc-complete-stats {
+      display: flex; gap: 20px; justify-content: center; margin-bottom: 28px;
     }
 
     /* ── Loading / Generating ── */
-    .generating-state {
-      text-align: center;
-      padding: 60px 20px;
-    }
+    .generating-state { text-align: center; padding: 60px 20px; }
     .spinner {
-      width: 48px; height: 48px;
-      border: 3px solid rgba(255,255,255,0.08);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 20px;
+      width: 48px; height: 48px; border: 3px solid rgba(255,255,255,0.08);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 20px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     .generating-state h3 { font-size: 1.2rem; margin-bottom: 8px; }
     .generating-state p { color: var(--text-secondary); font-size: 0.9rem; }
 
     /* ── Results ── */
-    .results-hero {
-      text-align: center;
-      padding: 20px 0 28px;
-    }
-    .score-ring {
-      width: 160px; height: 160px;
-      margin: 0 auto 24px;
-      position: relative;
-    }
-    .score-ring svg {
-      transform: rotate(-90deg);
-      width: 100%; height: 100%;
-    }
-    .score-ring circle {
-      fill: none;
-      stroke-width: 8;
-      stroke-linecap: round;
-    }
+    .results-hero { text-align: center; padding: 20px 0 28px; }
+    .score-ring { width: 160px; height: 160px; margin: 0 auto 24px; position: relative; }
+    .score-ring svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+    .score-ring circle { fill: none; stroke-width: 8; stroke-linecap: round; }
     .score-ring .ring-bg { stroke: rgba(255,255,255,0.06); }
     .score-ring .ring-fill {
-      stroke: var(--accent);
-      stroke-dasharray: 452;
-      stroke-dashoffset: 452;
+      stroke: var(--accent); stroke-dasharray: 452; stroke-dashoffset: 452;
       transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .score-ring .score-value {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    .score-number {
-      font-size: 2.8rem;
-      font-weight: 800;
-      letter-spacing: -2px;
-    }
-    .score-label {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
+    .score-ring .score-value { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .score-number { font-size: 2.8rem; font-weight: 800; letter-spacing: -2px; }
+    .score-label { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
 
     .readiness-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 22px;
-      border-radius: 24px;
-      font-weight: 700;
-      font-size: 0.95rem;
-      margin-bottom: 8px;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 22px; border-radius: 24px; font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;
     }
-    .readiness-badge.ready {
-      background: rgba(0,206,201,0.12);
-      color: var(--correct);
-      border: 1px solid rgba(0,206,201,0.3);
-    }
-    .readiness-badge.almost {
-      background: rgba(255,192,72,0.12);
-      color: var(--warning);
-      border: 1px solid rgba(255,192,72,0.3);
-    }
-    .readiness-badge.not-ready {
-      background: rgba(255,107,129,0.12);
-      color: var(--incorrect);
-      border: 1px solid rgba(255,107,129,0.3);
-    }
+    .readiness-badge.ready { background: rgba(0,206,201,0.12); color: var(--correct); border: 1px solid rgba(0,206,201,0.3); }
+    .readiness-badge.almost { background: rgba(255,192,72,0.12); color: var(--warning); border: 1px solid rgba(255,192,72,0.3); }
+    .readiness-badge.not-ready { background: rgba(255,107,129,0.12); color: var(--incorrect); border: 1px solid rgba(255,107,129,0.3); }
 
-    .results-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-top: 24px;
-    }
+    .results-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 24px; }
     .stat-card {
-      background: var(--bg-card);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      padding: 18px;
-      text-align: center;
+      background: var(--bg-card); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); padding: 18px; text-align: center;
     }
-    .stat-card .stat-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-    }
-    .stat-card .stat-label {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 4px;
-    }
+    .stat-card .stat-value { font-size: 1.5rem; font-weight: 700; }
+    .stat-card .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
     .stat-correct .stat-value { color: var(--correct); }
     .stat-incorrect .stat-value { color: var(--incorrect); }
     .stat-score .stat-value { color: var(--accent-light); }
+
+    /* ── Tutor Notes ── */
+    .tutor-notes-section { margin-top: 28px; margin-bottom: 28px; }
+    .tutor-notes-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+    }
+    .tutor-notes-header h3 { font-size: 1.1rem; }
+    .tutor-notes-header .tutor-badge {
+      padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700;
+      background: linear-gradient(135deg, rgba(108,92,231,0.2), rgba(0,206,201,0.15));
+      color: var(--accent-light); text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .tutor-note-card {
+      background: linear-gradient(145deg, rgba(108,92,231,0.06), rgba(0,206,201,0.03));
+      border: 1px solid rgba(108,92,231,0.15);
+      border-radius: var(--radius); margin-bottom: 12px; overflow: hidden;
+      transition: var(--transition);
+    }
+    .tutor-note-card:hover { border-color: rgba(108,92,231,0.3); }
+    .tutor-note-toggle {
+      width: 100%; padding: 16px 20px; background: none; border: none;
+      color: var(--text-primary); font-family: inherit; font-size: 0.95rem;
+      font-weight: 600; cursor: pointer; text-align: left;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .tutor-note-toggle:hover { background: rgba(255,255,255,0.02); }
+    .tutor-note-topic-label {
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .tutor-note-chevron {
+      transition: transform 0.3s ease; font-size: 0.8rem; color: var(--text-muted);
+    }
+    .tutor-note-card.open .tutor-note-chevron { transform: rotate(180deg); }
+    .tutor-note-body {
+      max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
+    }
+    .tutor-note-card.open .tutor-note-body { max-height: 1200px; }
+    .tutor-note-content {
+      padding: 0 20px 20px;
+      font-size: 0.88rem; line-height: 1.8; color: var(--text-secondary);
+    }
+    .tutor-note-content strong { color: var(--text-primary); }
+    .tutor-note-content .tutor-why {
+      margin-top: 12px; padding: 12px 16px;
+      background: rgba(255,107,129,0.06); border-left: 3px solid var(--incorrect);
+      border-radius: 0 8px 8px 0; font-size: 0.85rem;
+    }
+    .tutor-note-content .tutor-correct {
+      margin-top: 12px; padding: 12px 16px;
+      background: rgba(0,206,201,0.06); border-left: 3px solid var(--correct);
+      border-radius: 0 8px 8px 0; font-size: 0.85rem;
+    }
+    .tutor-note-content .tutor-tip {
+      margin-top: 12px; padding: 12px 16px;
+      background: rgba(108,92,231,0.08); border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0; font-size: 0.85rem;
+    }
+    .tutor-loading {
+      text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.9rem;
+    }
+    .tutor-loading .mini-spinner {
+      display: inline-block; width: 20px; height: 20px;
+      border: 2px solid rgba(255,255,255,0.08); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+      vertical-align: middle; margin-right: 8px;
+    }
 
     /* ── Answer Review ── */
     .review-section { margin-top: 28px; }
     .review-section h3 { font-size: 1.1rem; margin-bottom: 16px; }
     .review-card {
-      background: var(--bg-card);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      padding: 20px;
-      margin-bottom: 12px;
-      transition: var(--transition);
+      background: var(--bg-card); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); padding: 20px; margin-bottom: 12px; transition: var(--transition);
     }
-    .review-card:hover {
-      border-color: var(--glass-border-hover);
-    }
-    .review-q-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-    .review-q-num {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .review-card:hover { border-color: var(--glass-border-hover); }
+    .review-q-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .review-q-num { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
     .review-verdict {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 6px; font-size: 0.75rem;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
     }
     .verdict-correct { background: rgba(0,206,201,0.12); color: var(--correct); }
     .verdict-incorrect { background: rgba(255,107,129,0.12); color: var(--incorrect); }
     .verdict-partial { background: rgba(255,192,72,0.12); color: var(--warning); }
-
     .review-question { font-weight: 600; font-size: 0.95rem; margin-bottom: 12px; line-height: 1.5; }
-    .review-answer {
-      font-size: 0.85rem;
-      padding: 10px 14px;
-      border-radius: 8px;
-      margin-bottom: 6px;
-      line-height: 1.5;
-    }
+    .review-answer { font-size: 0.85rem; padding: 10px 14px; border-radius: 8px; margin-bottom: 6px; line-height: 1.5; }
     .review-your-answer { background: rgba(255,255,255,0.03); }
     .review-correct-answer { background: rgba(0,206,201,0.06); }
-    .answer-label {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
+    .answer-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 4px; }
     .review-explanation {
-      font-size: 0.83rem;
-      color: var(--text-secondary);
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid var(--glass-border);
-      line-height: 1.5;
+      font-size: 0.83rem; color: var(--text-secondary); margin-top: 10px;
+      padding-top: 10px; border-top: 1px solid var(--glass-border); line-height: 1.5;
     }
 
-    .results-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin-top: 28px;
-      flex-wrap: wrap;
-    }
+    .results-actions { display: flex; gap: 12px; justify-content: center; margin-top: 28px; flex-wrap: wrap; }
 
     /* ── History ── */
-    .history-empty {
-      text-align: center;
-      padding: 40px;
-      color: var(--text-muted);
-    }
+    .history-empty { text-align: center; padding: 40px; color: var(--text-muted); }
     .history-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 20px;
-      background: var(--bg-card);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      margin-bottom: 10px;
-      transition: var(--transition);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px; background: var(--bg-card);
+      border: 1px solid var(--glass-border); border-radius: var(--radius-sm);
+      margin-bottom: 10px; transition: var(--transition);
     }
     .history-item:hover { border-color: var(--glass-border-hover); }
     .history-info { display: flex; flex-direction: column; gap: 2px; }
     .history-doc { font-weight: 600; font-size: 0.9rem; }
     .history-meta { font-size: 0.78rem; color: var(--text-muted); }
-    .history-score {
-      font-size: 1.3rem;
-      font-weight: 800;
-    }
+    .history-score { font-size: 1.3rem; font-weight: 800; }
 
-    /* ── Toast notifications ── */
+    /* ── Toast ── */
     .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
+      position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(80px);
-      padding: 12px 24px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      color: var(--text-primary);
-      font-size: 0.88rem;
-      font-weight: 500;
-      z-index: 200;
-      opacity: 0;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      backdrop-filter: blur(16px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      padding: 12px 24px; background: var(--bg-secondary);
+      border: 1px solid var(--glass-border); border-radius: var(--radius-sm);
+      color: var(--text-primary); font-size: 0.88rem; font-weight: 500;
+      z-index: 200; opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     }
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     .toast.error { border-color: rgba(255,107,129,0.4); }
+
+    .key-status { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; padding: 4px 10px; border-radius: 6px; }
+    .key-status.saved { background: rgba(0,206,201,0.1); color: var(--correct); }
+    .key-status.missing { background: rgba(255,107,129,0.1); color: var(--incorrect); }
+
+    /* ── Grading overlay ── */
+    .grading-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(10,10,20,0.85); backdrop-filter: blur(8px);
+      z-index: 90; align-items: center; justify-content: center; flex-direction: column;
+    }
+    .grading-overlay.show { display: flex; }
 
     /* ── Responsive ── */
     @media (max-width: 600px) {
@@ -747,62 +532,9 @@
       .card { padding: 20px; }
       .results-stats { grid-template-columns: 1fr; }
       .app-header { flex-direction: column; gap: 12px; }
+      .mode-selector { flex-direction: column; }
+      .flashcard-face { padding: 24px; }
     }
-
-    /* ── Key saved indicator ── */
-    .key-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.78rem;
-      padding: 4px 10px;
-      border-radius: 6px;
-    }
-    .key-status.saved { background: rgba(0,206,201,0.1); color: var(--correct); }
-    .key-status.missing { background: rgba(255,107,129,0.1); color: var(--incorrect); }
-
-    /* ── Tab navigation ── */
-    .tab-bar {
-      display: flex;
-      gap: 4px;
-      padding: 4px;
-      background: var(--bg-card);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      margin-bottom: 28px;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 10px;
-      background: transparent;
-      border: none;
-      border-radius: 8px;
-      color: var(--text-muted);
-      font-family: inherit;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .tab-btn:hover { color: var(--text-secondary); }
-    .tab-btn.active {
-      background: rgba(108,92,231,0.15);
-      color: var(--accent-light);
-    }
-
-    /* Grading progress in the quiz */
-    .grading-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(10,10,20,0.85);
-      backdrop-filter: blur(8px);
-      z-index: 90;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
-    .grading-overlay.show { display: flex; }
   </style>
 </head>
 <body>
@@ -824,17 +556,14 @@
     <section class="screen active" id="screenUpload">
       <div class="upload-hero">
         <h1>Ace Your Exams</h1>
-        <p>Drop your course PDF and let AI craft exam questions to test your knowledge</p>
+        <p>Drop your course PDF and let your AI tutor craft personalized study sessions</p>
       </div>
-
       <div class="drop-zone" id="dropZone">
         <span class="drop-icon">📄</span>
         <h3>Drop your PDF here</h3>
         <p>or click to browse files</p>
-        <!-- Use position absolute to hide visually but remain clickable -->
         <input type="file" accept=".pdf,application/pdf" id="fileInput" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;">
       </div>
-
       <div class="file-info" id="fileInfo">
         <span class="file-icon">📑</span>
         <div class="file-details">
@@ -842,61 +571,94 @@
           <p id="filePages">—</p>
         </div>
       </div>
-
       <div class="extraction-progress" id="extractionProgress">
-        <div class="progress-bar-track">
-          <div class="progress-bar-fill" id="extractionBar"></div>
-        </div>
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="extractionBar"></div></div>
         <p class="progress-label" id="extractionLabel">Extracting text…</p>
       </div>
     </section>
 
-    <!-- ======== SCREEN: Configure Quiz ======== -->
+    <!-- ======== SCREEN: Configure ======== -->
     <section class="screen" id="screenConfig">
       <div class="card">
         <div class="config-header">
-          <h2>Configure Your Quiz</h2>
+          <h2>Study Session</h2>
           <div class="doc-badge" id="docBadge">📄 <span id="docName">—</span></div>
         </div>
 
-        <div class="config-grid">
-          <div class="form-group">
-            <label>Number of Questions</label>
-            <select class="form-input" id="numQuestions">
-              <option value="5">5 Questions</option>
-              <option value="10" selected>10 Questions</option>
-              <option value="15">15 Questions</option>
-              <option value="20">20 Questions</option>
-              <option value="30">30 Questions</option>
-            </select>
+        <!-- Mode Selector -->
+        <div class="mode-selector">
+          <button class="mode-card active" id="modeQuiz" onclick="selectMode('quiz')">
+            <span class="mode-icon">🧠</span>
+            <div class="mode-title">Quiz Mode</div>
+            <div class="mode-desc">Test yourself with exam-style questions and get graded</div>
+          </button>
+          <button class="mode-card" id="modeFlashcard" onclick="selectMode('flashcard')">
+            <span class="mode-icon">🃏</span>
+            <div class="mode-title">Flashcards</div>
+            <div class="mode-desc">Flip through key concepts and self-assess your knowledge</div>
+          </button>
+        </div>
+
+        <!-- Quiz-specific options -->
+        <div id="quizOptions">
+          <div class="config-grid">
+            <div class="form-group">
+              <label>Number of Questions</label>
+              <select class="form-input" id="numQuestions">
+                <option value="5">5 Questions</option>
+                <option value="10" selected>10 Questions</option>
+                <option value="15">15 Questions</option>
+                <option value="20">20 Questions</option>
+                <option value="30">30 Questions</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Question Type</label>
+              <select class="form-input" id="questionType">
+                <option value="mixed" selected>Mixed (MC + Short Answer)</option>
+                <option value="multiple_choice">Multiple Choice Only</option>
+                <option value="short_answer">Short Answer Only</option>
+                <option value="true_false">True / False Only</option>
+                <option value="all">All Types</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Difficulty</label>
+              <select class="form-input" id="difficulty">
+                <option value="easy">Easy</option>
+                <option value="medium" selected>Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Focus Area (optional)</label>
+              <input class="form-input" id="focusArea" type="text" placeholder="e.g. Chapter 3, Thermodynamics…">
+            </div>
           </div>
-          <div class="form-group">
-            <label>Question Type</label>
-            <select class="form-input" id="questionType">
-              <option value="mixed" selected>Mixed (MC + Short Answer)</option>
-              <option value="multiple_choice">Multiple Choice Only</option>
-              <option value="short_answer">Short Answer Only</option>
-              <option value="true_false">True / False Only</option>
-              <option value="all">All Types</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Difficulty</label>
-            <select class="form-input" id="difficulty">
-              <option value="easy">Easy</option>
-              <option value="medium" selected>Medium</option>
-              <option value="hard">Hard</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Focus Area (optional)</label>
-            <input class="form-input" id="focusArea" type="text" placeholder="e.g. Chapter 3, Thermodynamics…">
+        </div>
+
+        <!-- Flashcard-specific options -->
+        <div id="flashcardOptions" style="display:none;">
+          <div class="config-grid">
+            <div class="form-group">
+              <label>Number of Cards</label>
+              <select class="form-input" id="numCards">
+                <option value="10">10 Cards</option>
+                <option value="15" selected>15 Cards</option>
+                <option value="20">20 Cards</option>
+                <option value="30">30 Cards</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Focus Area (optional)</label>
+              <input class="form-input" id="fcFocusArea" type="text" placeholder="e.g. Key definitions, Chapter 5…">
+            </div>
           </div>
         </div>
 
         <div class="config-actions">
           <button class="btn" onclick="showScreen('upload')">← Back</button>
-          <button class="btn btn-primary btn-lg" onclick="generateQuiz()">🧠 Generate Quiz</button>
+          <button class="btn btn-primary btn-lg" id="btnStartSession" onclick="startSession()">🧠 Start Quiz</button>
         </div>
       </div>
     </section>
@@ -905,8 +667,8 @@
     <section class="screen" id="screenGenerating">
       <div class="card generating-state">
         <div class="spinner"></div>
-        <h3>Crafting Your Questions…</h3>
-        <p id="genStatus">Analyzing your course material and generating exam-style questions</p>
+        <h3 id="genTitle">Crafting Your Questions…</h3>
+        <p id="genStatus">Your AI tutor is analyzing the material and building a personalized session</p>
       </div>
     </section>
 
@@ -917,15 +679,64 @@
           <span class="quiz-counter" id="quizCounter">Question 1 of 10</span>
           <button class="btn" onclick="finishQuiz()" style="font-size:0.8rem; padding: 6px 14px;">Finish Early</button>
         </div>
-        <div class="quiz-progress">
-          <div class="quiz-progress-fill" id="quizProgressFill"></div>
-        </div>
-        <div id="questionContainer">
-          <!-- Populated by JS -->
-        </div>
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="quizProgressFill"></div></div>
+        <div id="questionContainer"></div>
         <div class="quiz-nav">
           <button class="btn" id="btnPrev" onclick="navQuestion(-1)">← Previous</button>
           <button class="btn btn-primary" id="btnNext" onclick="navQuestion(1)">Next →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== SCREEN: Flashcards ======== -->
+    <section class="screen" id="screenFlashcards">
+      <div class="card">
+        <div class="flashcard-header">
+          <span class="flashcard-counter" id="fcCounter">Card 1 of 15</span>
+          <div class="flashcard-stats">
+            <span class="fc-stat-got" id="fcGotCount">✓ 0</span>
+            <span class="fc-stat-learning" id="fcLearningCount">✗ 0</span>
+          </div>
+        </div>
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="fcProgressFill"></div></div>
+
+        <div id="fcActiveArea">
+          <div class="flashcard-scene">
+            <div class="flashcard" id="flashcard" onclick="flipCard()">
+              <div class="flashcard-face flashcard-front">
+                <span class="fc-label fc-front-label">QUESTION</span>
+                <div class="fc-content" id="fcFrontContent">—</div>
+                <span class="fc-topic" id="fcFrontTopic"></span>
+                <span class="fc-tap-hint">tap to flip</span>
+              </div>
+              <div class="flashcard-face flashcard-back">
+                <span class="fc-label fc-back-label">ANSWER</span>
+                <div class="fc-content" id="fcBackContent">—</div>
+                <span class="fc-tap-hint">rate yourself below</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flashcard-actions" id="fcActions" style="display:none;">
+            <button class="btn btn-success btn-lg" onclick="markCard(true)">✓ Got it</button>
+            <button class="btn btn-danger btn-lg" onclick="markCard(false)">✗ Still learning</button>
+          </div>
+        </div>
+
+        <div id="fcCompleteArea" style="display:none;">
+          <div class="fc-complete">
+            <h2>🎉 Session Complete!</h2>
+            <p id="fcCompleteMsg">Great job reviewing your flashcards</p>
+            <div class="fc-complete-stats">
+              <div class="stat-card stat-correct"><div class="stat-value" id="fcFinalGot">0</div><div class="stat-label">Got it</div></div>
+              <div class="stat-card stat-incorrect"><div class="stat-value" id="fcFinalLearning">0</div><div class="stat-label">Still learning</div></div>
+            </div>
+            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+              <button class="btn btn-primary btn-lg" onclick="restartFlashcards()" id="btnRestartLearning">🔄 Practice Weak Cards</button>
+              <button class="btn btn-lg" onclick="restartAllFlashcards()">🃏 Restart All</button>
+              <button class="btn btn-lg" onclick="newQuiz()">📄 New PDF</button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -935,7 +746,7 @@
       <div class="card generating-state">
         <div class="spinner"></div>
         <h3>Grading Your Answers…</h3>
-        <p>Evaluating your responses against the course material</p>
+        <p>Your tutor is evaluating your responses against the source material</p>
       </div>
     </section>
 
@@ -955,20 +766,21 @@
           </div>
           <div id="readinessBadge" class="readiness-badge not-ready">❌ Not Ready</div>
         </div>
-
         <div class="results-stats">
-          <div class="stat-card stat-correct">
-            <div class="stat-value" id="statCorrect">0</div>
-            <div class="stat-label">Correct</div>
-          </div>
-          <div class="stat-card stat-incorrect">
-            <div class="stat-value" id="statIncorrect">0</div>
-            <div class="stat-label">Incorrect</div>
-          </div>
-          <div class="stat-card stat-score">
-            <div class="stat-value" id="statTotal">0</div>
-            <div class="stat-label">Total</div>
-          </div>
+          <div class="stat-card stat-correct"><div class="stat-value" id="statCorrect">0</div><div class="stat-label">Correct</div></div>
+          <div class="stat-card stat-incorrect"><div class="stat-value" id="statIncorrect">0</div><div class="stat-label">Incorrect</div></div>
+          <div class="stat-card stat-score"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total</div></div>
+        </div>
+      </div>
+
+      <!-- Tutor Notes (generated for wrong answers) -->
+      <div class="tutor-notes-section" id="tutorNotesSection" style="display:none;">
+        <div class="tutor-notes-header">
+          <h3>📖 Your Tutor's Notes</h3>
+          <span class="tutor-badge">AI Tutor</span>
+        </div>
+        <div id="tutorNotesContainer">
+          <div class="tutor-loading"><span class="mini-spinner"></span> Your tutor is reviewing your mistakes and preparing explanations…</div>
         </div>
       </div>
 
@@ -1032,11 +844,11 @@
     <p style="color: var(--text-secondary); margin-top: 8px; font-size: 0.9rem;">Evaluating responses against the source material</p>
   </div>
 
-  <!-- PDF.js v3 classic build — creates global pdfjsLib, no ES modules needed -->
+  <!-- PDF.js v3 classic build -->
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
 
   <script>
-    // ── PDF.js Setup (classic global) ──
+    // ── PDF.js Setup ──
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
     // ── State ──
@@ -1046,6 +858,15 @@
     var userAnswers = [];
     var currentQ = 0;
     var gradingResults = [];
+    var studyMode = 'quiz'; // 'quiz' or 'flashcard'
+
+    // Flashcard state
+    var flashcards = [];       // Array of {front, back, topic}
+    var fcDeck = [];            // Current active deck (indices into flashcards)
+    var fcCurrentIdx = 0;       // Index into fcDeck
+    var fcGotIt = [];           // Cards marked "got it"
+    var fcStillLearning = [];   // Cards marked "still learning"
+    var fcFlipped = false;
 
     // ── Init ──
     window.addEventListener('DOMContentLoaded', () => {
@@ -1058,6 +879,22 @@
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       const screen = document.getElementById('screen' + id.charAt(0).toUpperCase() + id.slice(1));
       if (screen) screen.classList.add('active');
+    }
+
+    // ── Mode Selector ──
+    function selectMode(mode) {
+      studyMode = mode;
+      document.getElementById('modeQuiz').classList.toggle('active', mode === 'quiz');
+      document.getElementById('modeFlashcard').classList.toggle('active', mode === 'flashcard');
+      document.getElementById('quizOptions').style.display = mode === 'quiz' ? 'block' : 'none';
+      document.getElementById('flashcardOptions').style.display = mode === 'flashcard' ? 'block' : 'none';
+      const btn = document.getElementById('btnStartSession');
+      btn.innerHTML = mode === 'quiz' ? '🧠 Start Quiz' : '🃏 Generate Flashcards';
+    }
+
+    function startSession() {
+      if (studyMode === 'quiz') generateQuiz();
+      else generateFlashcards();
     }
 
     // ── Settings ──
@@ -1077,70 +914,39 @@
       toggleSettings();
       toast('API key saved ✓');
     }
-    function getApiKey() {
-      return localStorage.getItem('jschool_openrouter_key') || '';
-    }
+    function getApiKey() { return localStorage.getItem('jschool_openrouter_key') || ''; }
     function updateKeyStatus() {
       const el = document.getElementById('keyStatus');
-      if (getApiKey()) {
-        el.className = 'key-status saved';
-        el.textContent = '✓ Key saved';
-      } else {
-        el.className = 'key-status missing';
-        el.textContent = '✗ No key set';
-      }
+      if (getApiKey()) { el.className = 'key-status saved'; el.textContent = '✓ Key saved'; }
+      else { el.className = 'key-status missing'; el.textContent = '✗ No key set'; }
     }
 
     // ── File Upload / Drop ──
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
 
-    dropZone.addEventListener('click', () => {
-      fileInput.click();
-    });
-
-    dropZone.addEventListener('dragover', (e) => { 
-      e.preventDefault(); 
-      dropZone.classList.add('drag-over'); 
-    });
-    
-    dropZone.addEventListener('dragleave', () => {
-      dropZone.classList.remove('drag-over')
-    });
-    
+    dropZone.addEventListener('click', () => { fileInput.click(); });
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('drag-over'); });
     dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropZone.classList.remove('drag-over');
+      e.preventDefault(); dropZone.classList.remove('drag-over');
       const file = e.dataTransfer.files[0];
-      if (file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))) {
-        handleFile(file);
-      } else {
-        toast('Please drop a PDF file', true);
-      }
+      if (file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))) handleFile(file);
+      else toast('Please drop a PDF file', true);
     });
-
     fileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
-      if (file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))) {
-        handleFile(file);
-      }
+      if (file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))) handleFile(file);
     });
 
     async function handleFile(file) {
-      if (!getApiKey()) {
-        toggleSettings();
-        toast('Please set your OpenRouter API key first', true);
-        return;
-      }
-
+      if (!getApiKey()) { toggleSettings(); toast('Please set your OpenRouter API key first', true); return; }
       pdfFileName = file.name;
       document.getElementById('fileName').textContent = file.name;
-
       const fileInfoEl = document.getElementById('fileInfo');
       const progressEl = document.getElementById('extractionProgress');
       const barEl = document.getElementById('extractionBar');
       const labelEl = document.getElementById('extractionLabel');
-
       fileInfoEl.classList.add('show');
       progressEl.classList.add('show');
       barEl.style.width = '0%';
@@ -1150,7 +956,6 @@
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         const totalPages = pdf.numPages;
         document.getElementById('filePages').textContent = `${totalPages} pages · ${(file.size / 1024).toFixed(0)} KB`;
-
         let allText = '';
         for (let i = 1; i <= totalPages; i++) {
           const page = await pdf.getPage(i);
@@ -1161,24 +966,14 @@
           barEl.style.width = pct + '%';
           labelEl.textContent = `Extracting text… page ${i} of ${totalPages}`;
         }
-
         extractedText = allText.trim();
-
         if (extractedText.length < 50) {
           toast('Could not extract enough text from this PDF. It may be scanned/image-based.', true);
-          progressEl.classList.remove('show');
-          return;
+          progressEl.classList.remove('show'); return;
         }
-
         labelEl.textContent = `✓ Extracted ${extractedText.length.toLocaleString()} characters`;
         barEl.style.width = '100%';
-
-        // Move to config screen after a short delay
-        setTimeout(() => {
-          document.getElementById('docName').textContent = pdfFileName;
-          showScreen('config');
-        }, 800);
-
+        setTimeout(() => { document.getElementById('docName').textContent = pdfFileName; showScreen('config'); }, 800);
       } catch (err) {
         console.error(err);
         toast('Failed to read PDF: ' + err.message, true);
@@ -1186,45 +981,42 @@
       }
     }
 
-    // ── Quiz Generation (OpenRouter API) ──
+    // ── Prepare source text ──
+    function getSourceText(maxLen) {
+      let sourceText = extractedText;
+      if (sourceText.length > maxLen) {
+        sourceText = sourceText.substring(0, maxLen) + '\n[... content truncated for length ...]';
+      }
+      return sourceText;
+    }
+
+    // ── Quiz Generation ──
     async function generateQuiz() {
       const apiKey = getApiKey();
       if (!apiKey) { toggleSettings(); toast('Set your API key first', true); return; }
 
       showScreen('generating');
+      document.getElementById('genTitle').textContent = 'Crafting Your Questions…';
+      document.getElementById('genStatus').textContent = 'Your AI tutor is analyzing the material and building a personalized quiz';
 
       const numQ = parseInt(document.getElementById('numQuestions').value);
       const qType = document.getElementById('questionType').value;
       const diff = document.getElementById('difficulty').value;
       const focus = document.getElementById('focusArea').value.trim();
-
-      // Truncate text if too long (keep ~25k chars to stay within token limits of free models)
-      let sourceText = extractedText;
-      if (sourceText.length > 25000) {
-        sourceText = sourceText.substring(0, 25000) + '\n[... content truncated for length ...]';
-      }
+      const sourceText = getSourceText(25000);
 
       let typeInstructions = '';
       switch (qType) {
-        case 'multiple_choice':
-          typeInstructions = 'Generate ONLY multiple choice questions. Each must have exactly 4 options (A, B, C, D) with one correct answer.';
-          break;
-        case 'short_answer':
-          typeInstructions = 'Generate ONLY short answer questions that require a brief written response (1-3 sentences).';
-          break;
-        case 'true_false':
-          typeInstructions = 'Generate ONLY true/false questions.';
-          break;
-        case 'all':
-          typeInstructions = 'Generate a mix of multiple choice (4 options), short answer, and true/false questions.';
-          break;
-        default:
-          typeInstructions = 'Generate a mix of multiple choice (4 options) and short answer questions.';
+        case 'multiple_choice': typeInstructions = 'Generate ONLY multiple choice questions. Each must have exactly 4 options (A, B, C, D) with one correct answer.'; break;
+        case 'short_answer': typeInstructions = 'Generate ONLY short answer questions that require a brief written response (1-3 sentences).'; break;
+        case 'true_false': typeInstructions = 'Generate ONLY true/false questions.'; break;
+        case 'all': typeInstructions = 'Generate a mix of multiple choice (4 options), short answer, and true/false questions.'; break;
+        default: typeInstructions = 'Generate a mix of multiple choice (4 options) and short answer questions.';
       }
 
-      const focusInstr = focus ? `\nFOCUS AREA: Prioritize questions from this section/topic: "${focus}". If this topic is not found in the document, still generate questions from the available content but notify in the first question.` : '';
+      const focusInstr = focus ? `\nFOCUS AREA: Prioritize questions from this section/topic: "${focus}". If this topic is not found in the document, still generate questions from the available content.` : '';
 
-      const prompt = `You are an exam preparation assistant. You MUST generate quiz questions based STRICTLY and ONLY on the following course document content. Do NOT use any outside knowledge. Every question, answer, and explanation must be directly traceable to the provided text.
+      const prompt = `You are a university-level course tutor who is deeply familiar with the following material. You are helping a student prepare for exams by creating thoughtful, challenging questions that test REAL UNDERSTANDING — not just surface-level recall.
 
 DOCUMENT CONTENT:
 """
@@ -1234,8 +1026,14 @@ ${sourceText}
 INSTRUCTIONS:
 - Generate exactly ${numQ} questions at ${diff} difficulty level.
 - ${typeInstructions}${focusInstr}
-- Each question MUST be answerable from the document above. Do NOT invent facts or ask about topics not covered.
-- For each question include a brief explanation referencing what part of the document supports the answer.
+- Every question MUST be answerable STRICTLY from the document above. Do NOT use outside knowledge.
+- Create questions at different cognitive levels:
+  • Some that test definitions and key facts
+  • Some that test understanding of relationships and processes
+  • Some that test application (e.g., "Based on what the document says about X, what would happen if…")
+- Reference specific concepts, terms, or sections from the document in your questions.
+- Each question must have a "topic" field — a short label (2-5 words) identifying which topic/concept from the document the question covers.
+- For each question include a clear explanation that references the specific part of the document that supports the answer.
 - Respond with ONLY valid JSON (no markdown, no code fences) in this exact format:
 
 {
@@ -1243,25 +1041,28 @@ INSTRUCTIONS:
     {
       "id": 1,
       "type": "multiple_choice",
-      "question": "The question text",
-      "options": ["A) Option A", "B) Option B", "C) Option C", "D) Option D"],
-      "correct_answer": "A) Option A",
-      "explanation": "According to the document, ..."
+      "topic": "Cell Membrane Transport",
+      "question": "According to the material on membrane transport, which mechanism requires ATP?",
+      "options": ["A) Osmosis", "B) Facilitated diffusion", "C) Active transport", "D) Simple diffusion"],
+      "correct_answer": "C) Active transport",
+      "explanation": "The document explains in the section on membrane transport that active transport is the only mechanism that requires ATP energy to move molecules against their concentration gradient."
     },
     {
       "id": 2,
       "type": "short_answer",
-      "question": "The question text",
-      "correct_answer": "The expected answer based on document content",
-      "explanation": "The document states that ..."
+      "topic": "Photosynthesis",
+      "question": "The material describes two stages of photosynthesis. Explain how the products of the light reactions are used in the Calvin cycle.",
+      "correct_answer": "The light reactions produce ATP and NADPH, which are used in the Calvin cycle to power the conversion of CO2 into G3P (glucose). ATP provides the energy and NADPH provides the electrons needed for carbon fixation.",
+      "explanation": "This is covered in the photosynthesis chapter where it discusses the connection between the light-dependent and light-independent reactions."
     },
     {
       "id": 3,
       "type": "true_false",
-      "question": "Statement to evaluate as true or false",
+      "topic": "DNA Replication",
+      "question": "According to the document, DNA replication is semi-conservative, meaning each new DNA molecule contains one original strand and one newly synthesized strand.",
       "options": ["True", "False"],
       "correct_answer": "True",
-      "explanation": "This is supported by the document which says ..."
+      "explanation": "The document explicitly states that DNA replication follows a semi-conservative model, as demonstrated by the Meselson-Stahl experiment."
     }
   ]
 }`;
@@ -1269,23 +1070,169 @@ INSTRUCTIONS:
       try {
         const response = await callOpenRouter(apiKey, prompt);
         const parsed = parseJsonResponse(response);
-
         if (!parsed || !parsed.questions || parsed.questions.length === 0) {
           throw new Error('No questions were generated. Try a different PDF or settings.');
         }
-
         quizData = parsed.questions;
         userAnswers = new Array(quizData.length).fill(null);
         currentQ = 0;
-
         showScreen('quiz');
         renderQuestion();
-
       } catch (err) {
         console.error(err);
         showScreen('config');
         toast('Generation failed: ' + err.message, true);
       }
+    }
+
+    // ── Flashcard Generation ──
+    async function generateFlashcards() {
+      const apiKey = getApiKey();
+      if (!apiKey) { toggleSettings(); toast('Set your API key first', true); return; }
+
+      showScreen('generating');
+      document.getElementById('genTitle').textContent = 'Creating Your Flashcards…';
+      document.getElementById('genStatus').textContent = 'Your AI tutor is extracting key concepts from the material';
+
+      const numCards = parseInt(document.getElementById('numCards').value);
+      const focus = document.getElementById('fcFocusArea').value.trim();
+      const sourceText = getSourceText(25000);
+      const focusInstr = focus ? `\nFOCUS AREA: Prioritize concepts from this section/topic: "${focus}".` : '';
+
+      const prompt = `You are a university-level course tutor creating study flashcards from the following material. Extract the most important concepts, definitions, processes, and relationships that a student needs to know for their exam.
+
+DOCUMENT CONTENT:
+"""
+${sourceText}
+"""
+
+INSTRUCTIONS:
+- Create exactly ${numCards} flashcards.${focusInstr}
+- Each flashcard has a FRONT (question/concept/prompt) and BACK (detailed answer/explanation).
+- The FRONT should be a clear, concise question or concept prompt.
+- The BACK should be a thorough but concise answer (2-4 sentences) that would help a student understand and remember the concept.
+- Include a "topic" label for each card (2-5 words).
+- Cover a variety of important topics from the document — definitions, processes, relationships, key facts.
+- ALL content must come STRICTLY from the document. Do NOT add outside knowledge.
+- Respond with ONLY valid JSON (no markdown, no code fences):
+
+{
+  "flashcards": [
+    {
+      "front": "What is the difference between mitosis and meiosis?",
+      "back": "Mitosis produces two genetically identical diploid cells for growth and repair. Meiosis produces four genetically unique haploid cells (gametes) for sexual reproduction. Meiosis involves two divisions and crossing over, while mitosis involves only one division.",
+      "topic": "Cell Division"
+    }
+  ]
+}`;
+
+      try {
+        const response = await callOpenRouter(apiKey, prompt);
+        const parsed = parseJsonResponse(response);
+        if (!parsed || !parsed.flashcards || parsed.flashcards.length === 0) {
+          throw new Error('No flashcards were generated. Try a different PDF.');
+        }
+        flashcards = parsed.flashcards;
+        fcDeck = flashcards.map((_, i) => i);
+        fcCurrentIdx = 0;
+        fcGotIt = [];
+        fcStillLearning = [];
+        fcFlipped = false;
+
+        showScreen('flashcards');
+        document.getElementById('fcActiveArea').style.display = 'block';
+        document.getElementById('fcCompleteArea').style.display = 'none';
+        renderFlashcard();
+      } catch (err) {
+        console.error(err);
+        showScreen('config');
+        toast('Generation failed: ' + err.message, true);
+      }
+    }
+
+    // ── Flashcard Rendering & Logic ──
+    function renderFlashcard() {
+      if (fcDeck.length === 0) { showFcComplete(); return; }
+      const card = flashcards[fcDeck[fcCurrentIdx]];
+      document.getElementById('fcFrontContent').textContent = card.front;
+      document.getElementById('fcBackContent').textContent = card.back;
+      document.getElementById('fcFrontTopic').textContent = card.topic || '';
+      document.getElementById('fcCounter').textContent = `Card ${fcCurrentIdx + 1} of ${fcDeck.length}`;
+      document.getElementById('fcGotCount').textContent = `✓ ${fcGotIt.length}`;
+      document.getElementById('fcLearningCount').textContent = `✗ ${fcStillLearning.length}`;
+      const total = flashcards.length;
+      const reviewed = fcGotIt.length + fcStillLearning.length;
+      document.getElementById('fcProgressFill').style.width = `${(reviewed / total) * 100}%`;
+
+      // Reset flip state
+      fcFlipped = false;
+      document.getElementById('flashcard').classList.remove('flipped');
+      document.getElementById('fcActions').style.display = 'none';
+    }
+
+    function flipCard() {
+      fcFlipped = !fcFlipped;
+      document.getElementById('flashcard').classList.toggle('flipped', fcFlipped);
+      if (fcFlipped) {
+        document.getElementById('fcActions').style.display = 'flex';
+      }
+    }
+
+    function markCard(gotIt) {
+      const cardIdx = fcDeck[fcCurrentIdx];
+      if (gotIt) {
+        fcGotIt.push(cardIdx);
+      } else {
+        fcStillLearning.push(cardIdx);
+      }
+      // Remove from current deck
+      fcDeck.splice(fcCurrentIdx, 1);
+      if (fcDeck.length === 0) {
+        showFcComplete();
+        return;
+      }
+      // Adjust index
+      if (fcCurrentIdx >= fcDeck.length) fcCurrentIdx = 0;
+      renderFlashcard();
+    }
+
+    function showFcComplete() {
+      document.getElementById('fcActiveArea').style.display = 'none';
+      document.getElementById('fcCompleteArea').style.display = 'block';
+      document.getElementById('fcFinalGot').textContent = fcGotIt.length;
+      document.getElementById('fcFinalLearning').textContent = fcStillLearning.length;
+
+      const pct = Math.round((fcGotIt.length / flashcards.length) * 100);
+      if (pct >= 80) {
+        document.getElementById('fcCompleteMsg').textContent = `Amazing! You nailed ${pct}% of the cards. You're well prepared!`;
+      } else if (pct >= 50) {
+        document.getElementById('fcCompleteMsg').textContent = `Good progress — ${pct}% mastered. Practice the weak cards to lock them in.`;
+      } else {
+        document.getElementById('fcCompleteMsg').textContent = `${pct}% mastered so far. Keep practicing — you'll get there!`;
+      }
+
+      // Hide "Practice Weak Cards" if there are none
+      document.getElementById('btnRestartLearning').style.display = fcStillLearning.length > 0 ? 'inline-flex' : 'none';
+    }
+
+    function restartFlashcards() {
+      // Only cycle through "still learning" cards
+      fcDeck = [...fcStillLearning];
+      fcStillLearning = [];
+      fcCurrentIdx = 0;
+      document.getElementById('fcActiveArea').style.display = 'block';
+      document.getElementById('fcCompleteArea').style.display = 'none';
+      renderFlashcard();
+    }
+
+    function restartAllFlashcards() {
+      fcDeck = flashcards.map((_, i) => i);
+      fcCurrentIdx = 0;
+      fcGotIt = [];
+      fcStillLearning = [];
+      document.getElementById('fcActiveArea').style.display = 'block';
+      document.getElementById('fcCompleteArea').style.display = 'none';
+      renderFlashcard();
     }
 
     // ── OpenRouter API Call ──
@@ -1294,44 +1241,48 @@ INSTRUCTIONS:
       const body = {
         model: "openrouter/free",
         messages: [
-          { role: "system", content: "You are a precise JSON-generating assistant. ALWAYS reply with only raw, valid JSON." },
+          { role: "system", content: "You are a precise JSON-generating assistant. ALWAYS reply with only raw, valid JSON. No markdown formatting, no code fences, no extra text." },
           { role: "user", content: prompt }
         ],
-        temperature: 0.2
+        temperature: 0.3
       };
-
       const res = await fetch(url, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
-          'HTTP-Referer': window.location.origin, 
+          'HTTP-Referer': window.location.origin,
           'X-Title': 'JSchool Exam Prep'
         },
         body: JSON.stringify(body)
       });
-
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         const msg = errData?.error?.message || `API Error ${res.status}`;
         throw new Error(msg);
       }
-
       const data = await res.json();
       return data.choices?.[0]?.message?.content || '';
     }
 
     function parseJsonResponse(text) {
-      // Strip markdown code fences if present
       let cleaned = text.trim();
       if (cleaned.startsWith('```')) {
         cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
       }
-      // Attempt to extract json object if model included extra text
+      // Find the outermost JSON object or array
       const firstBrace = cleaned.indexOf('{');
-      const lastBrace = cleaned.lastIndexOf('}');
-      if (firstBrace !== -1 && lastBrace !== -1) {
-        cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+      const firstBracket = cleaned.indexOf('[');
+      let start, end;
+      if (firstBracket !== -1 && (firstBrace === -1 || firstBracket < firstBrace)) {
+        start = firstBracket;
+        end = cleaned.lastIndexOf(']');
+      } else {
+        start = firstBrace;
+        end = cleaned.lastIndexOf('}');
+      }
+      if (start !== -1 && end !== -1) {
+        cleaned = cleaned.substring(start, end + 1);
       }
       return JSON.parse(cleaned);
     }
@@ -1348,8 +1299,10 @@ INSTRUCTIONS:
       if (q.type === 'short_answer') { badgeClass = 'badge-sa'; badgeText = 'Short Answer'; }
       if (q.type === 'true_false') { badgeClass = 'badge-tf'; badgeText = 'True / False'; }
 
+      let topicHtml = q.topic ? `<span class="question-topic">${escHtml(q.topic)}</span>` : '';
+
       let html = `
-        <span class="question-type-badge ${badgeClass}">${badgeText}</span>
+        <span class="question-type-badge ${badgeClass}">${badgeText}</span>${topicHtml}
         <p class="question-text">${escHtml(q.question)}</p>
       `;
 
@@ -1370,23 +1323,15 @@ INSTRUCTIONS:
       }
 
       document.getElementById('questionContainer').innerHTML = html;
-
-      // Nav button states
       document.getElementById('btnPrev').style.visibility = currentQ === 0 ? 'hidden' : 'visible';
       const isLast = currentQ === total - 1;
       document.getElementById('btnNext').textContent = isLast ? '✓ Submit Quiz' : 'Next →';
     }
 
-    function selectMcOption(qIndex, value) {
-      userAnswers[qIndex] = value;
-      renderQuestion();
-    };
+    function selectMcOption(qIndex, value) { userAnswers[qIndex] = value; renderQuestion(); }
 
     function navQuestion(dir) {
-      if (dir === 1 && currentQ === quizData.length - 1) {
-        finishQuiz();
-        return;
-      }
+      if (dir === 1 && currentQ === quizData.length - 1) { finishQuiz(); return; }
       currentQ = Math.max(0, Math.min(quizData.length - 1, currentQ + dir));
       renderQuestion();
     }
@@ -1397,19 +1342,12 @@ INSTRUCTIONS:
       if (unanswered > 0) {
         if (!confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) return;
       }
-
       const apiKey = getApiKey();
-
-      // Grade short answer questions via AI, MC/TF locally
       showScreen('grading');
       gradingResults = [];
 
       const shortAnswerIndices = [];
-      quizData.forEach((q, i) => {
-        if (q.type === 'short_answer') {
-          shortAnswerIndices.push(i);
-        }
-      });
+      quizData.forEach((q, i) => { if (q.type === 'short_answer') shortAnswerIndices.push(i); });
 
       // Grade MC & TF locally
       quizData.forEach((q, i) => {
@@ -1417,67 +1355,46 @@ INSTRUCTIONS:
           const userAns = userAnswers[i] || '';
           const isCorrect = userAns === q.correct_answer;
           gradingResults[i] = {
-            correct: isCorrect,
-            score: isCorrect ? 1 : 0,
+            correct: isCorrect, score: isCorrect ? 1 : 0,
             feedback: isCorrect ? 'Correct!' : `The correct answer was: ${q.correct_answer}`,
             explanation: q.explanation || ''
           };
         }
       });
 
-      // Grade short-answer via OpenRouter (batch them)
+      // Grade short-answer via AI
       if (shortAnswerIndices.length > 0 && apiKey) {
         try {
           const saItems = shortAnswerIndices.map(i => ({
-            id: i + 1,
-            question: quizData[i].question,
+            id: i + 1, question: quizData[i].question,
             correct_answer: quizData[i].correct_answer,
             user_answer: userAnswers[i] || '(no answer)'
           }));
+          const gradingPrompt = `You are a fair but thorough exam grader. Grade each answer by comparing the student's response to the correct answer. Accept answers that convey the same meaning even if worded differently. Grade based ONLY on content accuracy, not grammar or style.
 
-          const gradingPrompt = `You are grading exam answers. Grade each answer by comparing the student's response to the correct answer. Be fair — accept answers that convey the same meaning even if worded differently. Grade based ONLY on the content accuracy, not grammar or style.
+For each answer, respond with a JSON array (no markdown, no code fences):
+[{"id": 1, "score": 0.0, "correct": false, "feedback": "Brief feedback"}]
 
-For each answer, respond with a JSON array in this exact format (no markdown, no code fences):
-[
-  {
-    "id": 1,
-    "score": 0.0,
-    "correct": false,
-    "feedback": "Brief feedback explaining the grade"
-  }
-]
-
-Score guide: 1.0 = fully correct, 0.5 = partially correct, 0.0 = incorrect or not answered. Ensure your output is purely the JSON array.
+Score: 1.0 = fully correct, 0.5 = partially correct, 0.0 = incorrect/not answered.
 
 ANSWERS TO GRADE:
 ${JSON.stringify(saItems, null, 2)}`;
-
           const gradeResponse = await callOpenRouter(apiKey, gradingPrompt);
           const grades = parseJsonResponse(gradeResponse);
-
-          grades.forEach(g => {
+          (Array.isArray(grades) ? grades : []).forEach(g => {
             const idx = g.id - 1;
             gradingResults[idx] = {
-              correct: g.score >= 0.7,
-              partial: g.score >= 0.3 && g.score < 0.7,
-              score: g.score,
-              feedback: g.feedback,
-              explanation: quizData[idx].explanation || ''
+              correct: g.score >= 0.7, partial: g.score >= 0.3 && g.score < 0.7,
+              score: g.score, feedback: g.feedback, explanation: quizData[idx].explanation || ''
             };
           });
         } catch (err) {
           console.error('Grading error:', err);
-          // Fall back to simple string comparison
           shortAnswerIndices.forEach(i => {
             const userAns = (userAnswers[i] || '').trim().toLowerCase();
             const correct = (quizData[i].correct_answer || '').trim().toLowerCase();
             const isCorrect = userAns === correct || correct.includes(userAns);
-            gradingResults[i] = {
-              correct: isCorrect,
-              score: isCorrect ? 1 : 0,
-              feedback: isCorrect ? 'Correct!' : 'Incorrect.',
-              explanation: quizData[i].explanation || ''
-            };
+            gradingResults[i] = { correct: isCorrect, score: isCorrect ? 1 : 0, feedback: isCorrect ? 'Correct!' : 'Incorrect.', explanation: quizData[i].explanation || '' };
           });
         }
       }
@@ -1485,12 +1402,7 @@ ${JSON.stringify(saItems, null, 2)}`;
       // Fill any remaining
       quizData.forEach((q, i) => {
         if (!gradingResults[i]) {
-          gradingResults[i] = {
-            correct: false,
-            score: 0,
-            feedback: 'Not answered.',
-            explanation: q.explanation || ''
-          };
+          gradingResults[i] = { correct: false, score: 0, feedback: 'Not answered.', explanation: q.explanation || '' };
         }
       });
 
@@ -1499,50 +1411,31 @@ ${JSON.stringify(saItems, null, 2)}`;
 
     function showResults() {
       const total = quizData.length;
-      let totalScore = 0;
-      let correctCount = 0;
-
-      gradingResults.forEach(r => {
-        totalScore += r.score;
-        if (r.correct) correctCount++;
-      });
-
+      let totalScore = 0, correctCount = 0;
+      gradingResults.forEach(r => { totalScore += r.score; if (r.correct) correctCount++; });
       const percent = Math.round((totalScore / total) * 100);
       const incorrect = total - correctCount;
 
-      // Save to history
       saveToHistory(pdfFileName, percent, correctCount, total);
-
-      // Render results screen
       showScreen('results');
 
       // Animate score ring
       const ring = document.getElementById('scoreRing');
-      const circumference = 2 * Math.PI * 72; // r=72
+      const circumference = 2 * Math.PI * 72;
       const offset = circumference - (percent / 100) * circumference;
       setTimeout(() => {
         ring.style.strokeDashoffset = offset;
-        // Color the ring based on score
         if (percent >= 80) ring.style.stroke = 'var(--correct)';
         else if (percent >= 50) ring.style.stroke = 'var(--warning)';
         else ring.style.stroke = 'var(--incorrect)';
       }, 100);
-
-      // Animate the score number
       animateValue('scorePercent', 0, percent, 1200, '%');
 
       // Readiness badge
       const badge = document.getElementById('readinessBadge');
-      if (percent >= 80) {
-        badge.className = 'readiness-badge ready';
-        badge.textContent = '🎯 Exam Ready!';
-      } else if (percent >= 50) {
-        badge.className = 'readiness-badge almost';
-        badge.textContent = '📖 Almost There — Review Weak Areas';
-      } else {
-        badge.className = 'readiness-badge not-ready';
-        badge.textContent = '📚 Keep Studying — Not Ready Yet';
-      }
+      if (percent >= 80) { badge.className = 'readiness-badge ready'; badge.textContent = '🎯 Exam Ready!'; }
+      else if (percent >= 50) { badge.className = 'readiness-badge almost'; badge.textContent = '📖 Almost There — Review Weak Areas'; }
+      else { badge.className = 'readiness-badge not-ready'; badge.textContent = '📚 Keep Studying — Not Ready Yet'; }
 
       document.getElementById('statCorrect').textContent = correctCount;
       document.getElementById('statIncorrect').textContent = incorrect;
@@ -1554,6 +1447,7 @@ ${JSON.stringify(saItems, null, 2)}`;
         const r = gradingResults[i];
         let verdictClass = r.correct ? 'verdict-correct' : (r.partial ? 'verdict-partial' : 'verdict-incorrect');
         let verdictText = r.correct ? '✓ Correct' : (r.partial ? '~ Partial' : '✗ Incorrect');
+        let topicTag = q.topic ? `<span class="question-topic" style="margin-left:0;margin-top:4px;">${escHtml(q.topic)}</span>` : '';
 
         reviewHtml += `
           <div class="review-card">
@@ -1561,6 +1455,7 @@ ${JSON.stringify(saItems, null, 2)}`;
               <span class="review-q-num">Question ${i + 1} · ${q.type.replace('_', ' ')}</span>
               <span class="review-verdict ${verdictClass}">${verdictText}</span>
             </div>
+            ${topicTag}
             <p class="review-question">${escHtml(q.question)}</p>
             <div class="review-answer review-your-answer">
               <div class="answer-label">Your Answer</div>
@@ -1576,6 +1471,120 @@ ${JSON.stringify(saItems, null, 2)}`;
           </div>`;
       });
       document.getElementById('reviewContainer').innerHTML = reviewHtml;
+
+      // Generate tutor notes for incorrect answers
+      const wrongIndices = [];
+      gradingResults.forEach((r, i) => { if (!r.correct) wrongIndices.push(i); });
+
+      if (wrongIndices.length > 0) {
+        document.getElementById('tutorNotesSection').style.display = 'block';
+        document.getElementById('tutorNotesContainer').innerHTML = '<div class="tutor-loading"><span class="mini-spinner"></span> Your tutor is reviewing your mistakes and preparing personalized explanations…</div>';
+        generateTutorNotes(wrongIndices);
+      } else {
+        document.getElementById('tutorNotesSection').style.display = 'none';
+      }
+    }
+
+    // ── Tutor Notes Generation ──
+    async function generateTutorNotes(wrongIndices) {
+      const apiKey = getApiKey();
+      if (!apiKey) return;
+
+      const wrongItems = wrongIndices.map(i => ({
+        question_number: i + 1,
+        topic: quizData[i].topic || 'General',
+        question: quizData[i].question,
+        student_answer: userAnswers[i] || '(not answered)',
+        correct_answer: quizData[i].correct_answer,
+      }));
+
+      const sourceText = getSourceText(15000);
+
+      const prompt = `You are a caring, knowledgeable course tutor sitting down with a student after an exam to help them understand what they got wrong. The student just took a quiz on the document below and missed some questions.
+
+DOCUMENT CONTENT (for reference):
+"""
+${sourceText}
+"""
+
+QUESTIONS THE STUDENT GOT WRONG:
+${JSON.stringify(wrongItems, null, 2)}
+
+For each wrong answer, write a personalized teaching explanation. Group your explanations by topic. For each topic:
+1. Explain the concept clearly and simply, as if teaching it for the first time
+2. Explain specifically WHY the student's answer was wrong
+3. State what the correct understanding should be
+4. Give a practical study tip or memory trick to help them remember
+
+Respond with ONLY valid JSON (no markdown, no code fences):
+{
+  "notes": [
+    {
+      "topic": "Topic Name",
+      "questions_covered": [1, 3],
+      "concept_explanation": "Clear explanation of the concept using simple language...",
+      "why_wrong": "The student's answer suggested that... but actually the document explains that...",
+      "correct_understanding": "The key thing to remember is...",
+      "study_tip": "A helpful way to remember this is..."
+    }
+  ]
+}`;
+
+      try {
+        const response = await callOpenRouter(apiKey, prompt);
+        const parsed = parseJsonResponse(response);
+        if (parsed && parsed.notes && parsed.notes.length > 0) {
+          renderTutorNotes(parsed.notes);
+        } else {
+          document.getElementById('tutorNotesContainer').innerHTML = '<div class="tutor-loading">Your tutor couldn\'t generate notes this time. Check the question review below.</div>';
+        }
+      } catch (err) {
+        console.error('Tutor notes error:', err);
+        document.getElementById('tutorNotesContainer').innerHTML = '<div class="tutor-loading">Your tutor couldn\'t generate notes this time. Check the question review below.</div>';
+      }
+    }
+
+    function renderTutorNotes(notes) {
+      let html = '';
+      notes.forEach((note, idx) => {
+        const qRefs = (note.questions_covered || []).map(q => `Q${q}`).join(', ');
+        html += `
+          <div class="tutor-note-card${idx === 0 ? ' open' : ''}" onclick="toggleTutorNote(this)">
+            <button class="tutor-note-toggle">
+              <span class="tutor-note-topic-label">
+                📖 ${escHtml(note.topic)}
+                <span style="font-size:0.72rem; color:var(--text-muted); font-weight:400;">${qRefs ? '(' + qRefs + ')' : ''}</span>
+              </span>
+              <span class="tutor-note-chevron">▼</span>
+            </button>
+            <div class="tutor-note-body">
+              <div class="tutor-note-content">
+                <strong>📘 Understanding the Concept:</strong>
+                <p style="margin-top:6px;">${escHtml(note.concept_explanation)}</p>
+
+                <div class="tutor-why">
+                  <strong>❌ Where you went wrong:</strong>
+                  <p style="margin-top:4px;">${escHtml(note.why_wrong)}</p>
+                </div>
+
+                <div class="tutor-correct">
+                  <strong>✅ What you should know:</strong>
+                  <p style="margin-top:4px;">${escHtml(note.correct_understanding)}</p>
+                </div>
+
+                <div class="tutor-tip">
+                  <strong>💡 Study Tip:</strong>
+                  <p style="margin-top:4px;">${escHtml(note.study_tip)}</p>
+                </div>
+              </div>
+            </div>
+          </div>`;
+      });
+      document.getElementById('tutorNotesContainer').innerHTML = html;
+    }
+
+    function toggleTutorNote(card) {
+      card.classList.toggle('open');
     }
 
     function animateValue(elemId, start, end, duration, suffix = '') {
@@ -1595,18 +1604,12 @@ ${JSON.stringify(saItems, null, 2)}`;
     // ── Retake / New ──
     function retakeQuiz() {
       userAnswers = new Array(quizData.length).fill(null);
-      currentQ = 0;
-      showScreen('quiz');
-      renderQuestion();
+      currentQ = 0; showScreen('quiz'); renderQuestion();
     }
     function newQuiz() {
-      extractedText = '';
-      pdfFileName = '';
-      quizData = [];
-      userAnswers = [];
-      currentQ = 0;
-      gradingResults = [];
-      // Reset upload UI
+      extractedText = ''; pdfFileName = ''; quizData = []; userAnswers = [];
+      currentQ = 0; gradingResults = []; flashcards = []; fcDeck = [];
+      fcGotIt = []; fcStillLearning = [];
       document.getElementById('fileInfo').classList.remove('show');
       document.getElementById('extractionProgress').classList.remove('show');
       document.getElementById('fileInput').value = '';
@@ -1614,18 +1617,10 @@ ${JSON.stringify(saItems, null, 2)}`;
     }
 
     // ── History ──
-    function getHistory() {
-      try { return JSON.parse(localStorage.getItem('jschool_history') || '[]'); }
-      catch { return []; }
-    }
+    function getHistory() { try { return JSON.parse(localStorage.getItem('jschool_history') || '[]'); } catch { return []; } }
     function saveToHistory(docName, score, correct, total) {
       const history = getHistory();
-      history.unshift({
-        docName, score, correct, total,
-        date: new Date().toISOString(),
-        id: Date.now()
-      });
-      // Keep last 50
+      history.unshift({ docName, score, correct, total, date: new Date().toISOString(), id: Date.now() });
       if (history.length > 50) history.length = 50;
       localStorage.setItem('jschool_history', JSON.stringify(history));
       renderHistory();
@@ -1634,13 +1629,10 @@ ${JSON.stringify(saItems, null, 2)}`;
       const history = getHistory();
       const container = document.getElementById('historyContainer');
       const clearBtn = document.getElementById('btnClearHistory');
-
       if (history.length === 0) {
         container.innerHTML = '<div class="history-empty">No quizzes taken yet. Upload a PDF to get started!</div>';
-        clearBtn.style.display = 'none';
-        return;
+        clearBtn.style.display = 'none'; return;
       }
-
       clearBtn.style.display = 'inline-flex';
       container.innerHTML = history.map(h => {
         const d = new Date(h.date);
@@ -1649,8 +1641,7 @@ ${JSON.stringify(saItems, null, 2)}`;
         let scoreColor = 'var(--incorrect)';
         if (h.score >= 80) scoreColor = 'var(--correct)';
         else if (h.score >= 50) scoreColor = 'var(--warning)';
-        return `
-          <div class="history-item">
+        return `<div class="history-item">
             <div class="history-info">
               <span class="history-doc">📄 ${escHtml(h.docName)}</span>
               <span class="history-meta">${dateStr} at ${timeStr} · ${h.correct}/${h.total} correct</span>
@@ -1662,24 +1653,15 @@ ${JSON.stringify(saItems, null, 2)}`;
     function clearHistory() {
       if (!confirm('Clear all quiz history?')) return;
       localStorage.removeItem('jschool_history');
-      renderHistory();
-      toast('History cleared');
+      renderHistory(); toast('History cleared');
     }
 
     // ── Helpers ──
-    function escHtml(str) {
-      if (!str) return '';
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
-    }
-    function escAttr(str) {
-      return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-    }
+    function escHtml(str) { if (!str) return ''; const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
+    function escAttr(str) { return str.replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
     function toast(msg, isError = false) {
       const el = document.getElementById('toast');
-      el.textContent = msg;
-      el.className = 'toast' + (isError ? ' error' : '');
+      el.textContent = msg; el.className = 'toast' + (isError ? ' error' : '');
       setTimeout(() => el.classList.add('show'), 10);
       setTimeout(() => el.classList.remove('show'), 3500);
     }
