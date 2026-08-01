@@ -831,7 +831,8 @@
         <span class="drop-icon">📄</span>
         <h3>Drop your PDF here</h3>
         <p>or click to browse files</p>
-        <input type="file" accept=".pdf" id="fileInput" style="display:none">
+        <!-- Use position absolute to hide visually but remain clickable -->
+        <input type="file" accept=".pdf,application/pdf" id="fileInput" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;">
       </div>
 
       <div class="file-info" id="fileInfo">
@@ -1031,10 +1032,25 @@
     <p style="color: var(--text-secondary); margin-top: 8px; font-size: 0.9rem;">Evaluating responses against the source material</p>
   </div>
 
+  <!-- PDF.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
+  
   <script type="module">
-    // ── PDF.js Setup ──
-    import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs';
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
+    // We can just rely on the global pdfjsLib after it's imported dynamically.
+    // To ensure compatibility, we use the standard dynamic import here instead of mutating the module export.
+    let pdfjsLib;
+
+    async function initPDFJS() {
+      try {
+        pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs');
+        if (pdfjsLib.GlobalWorkerOptions) {
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
+        }
+      } catch (e) {
+        console.error("PDF.js init error:", e);
+      }
+    }
+    initPDFJS();
 
     // ── State ──
     let extractedText = '';
@@ -1104,9 +1120,19 @@
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
 
-    dropZone.addEventListener('click', () => fileInput.click());
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    dropZone.addEventListener('dragover', (e) => { 
+      e.preventDefault(); 
+      dropZone.classList.add('drag-over'); 
+    });
+    
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('drag-over')
+    });
+    
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
       dropZone.classList.remove('drag-over');
@@ -1117,6 +1143,7 @@
         toast('Please drop a PDF file', true);
       }
     });
+
     fileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))) {
@@ -1128,6 +1155,11 @@
       if (!getApiKey()) {
         toggleSettings();
         toast('Please set your Gemini API key first', true);
+        return;
+      }
+
+      if (!pdfjsLib) {
+        toast('PDF parser is still loading. Please wait a moment and try again.', true);
         return;
       }
 
