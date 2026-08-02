@@ -664,18 +664,19 @@
 
     /* ── ChatGPT Style Ask Tutor ── */
     #screenAskTutor.screen {
+      position: absolute; inset: 0; z-index: 10;
       padding: 0 !important; margin: 0 !important; max-width: 100% !important;
-      height: 100vh; display: flex; flex-direction: column; background: #07070e;
+      height: 100vh; display: flex; flex-direction: column; background: var(--bg-primary);
     }
     .ask-chat-container {
       display: flex; flex-direction: column; height: 100%; width: 100%;
       padding: 0 !important; margin: 0 !important; border: none !important;
-      background: transparent !important; border-radius: 0 !important; overflow: hidden;
+      background: var(--bg-primary) !important; border-radius: 0 !important; overflow: hidden;
     }
     .ask-header {
-      padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 14px 20px; border-bottom: 1px solid var(--glass-border);
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      background: #07070e; flex-shrink: 0;
+      background: var(--bg-surface); flex-shrink: 0;
     }
     .ask-header-btn {
       width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05);
@@ -737,11 +738,11 @@
     .chat-bubble code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; }
 
     .ask-input-wrapper {
-      padding: 12px 16px 20px; background: #07070e; flex-shrink: 0;
+      padding: 12px 16px 20px; background: var(--bg-primary); flex-shrink: 0;
     }
     .ask-input-box {
       display: flex; align-items: center; gap: 10px;
-      background: #141424; border: 1px solid rgba(255,255,255,0.08);
+      background: var(--bg-surface-2); border: 1px solid var(--glass-border);
       border-radius: 30px; padding: 6px 8px 6px 16px; transition: var(--transition);
     }
     .ask-input-box:focus-within { border-color: #6c5ce7; box-shadow: 0 0 16px rgba(108,92,231,0.25); }
@@ -1461,6 +1462,17 @@
         document.getElementById('apiKeyInput').value = localStorage.getItem('jschool_openrouter_key') || '';
       }
       
+      // Toggle full-bleed for Ask Tutor (hide global mobile-header)
+      var mh = document.querySelector('.mobile-header');
+      var ac = document.querySelector('.app-container');
+      if (id === 'askTutor') {
+        if (mh) mh.style.display = 'none';
+        if (ac) ac.style.padding = '0';
+      } else {
+        if (mh) mh.style.display = '';
+        if (ac) ac.style.padding = '';
+      }
+
       // Close sidebar on mobile if open
       var sb = document.getElementById('sidebar'); if (sb) sb.classList.remove('open');
       var so = document.getElementById('sidebarOverlay'); if (so) so.classList.remove('show');
