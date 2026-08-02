@@ -1199,6 +1199,13 @@
         updateUserUI();
         if (user) {
           syncHistoryFromFirestore();
+          db.collection('users').doc(user.uid).set({
+            uid: user.uid,
+            email: user.email || '',
+            displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'Student'),
+            photoURL: user.photoURL || '',
+            lastActive: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true }).catch(console.error);
         }
       });
     }
