@@ -500,18 +500,25 @@
     .results-actions { display: flex; gap: 10px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
 
     /* ── History ── */
-    .history-empty { text-align: center; padding: 36px; color: var(--text-muted); font-size: 0.88rem; }
+    .history-empty { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 0.88rem; }
     .hist-item {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 18px; background: var(--bg-card);
+      padding: 16px 20px; background: var(--bg-surface);
       border: 1px solid var(--glass-border); border-radius: var(--radius-sm);
-      margin-bottom: 8px; transition: var(--transition);
+      margin-bottom: 10px; transition: var(--transition); gap: 14px;
+      max-width: 100%; overflow: hidden;
     }
-    .hist-item:hover { border-color: var(--glass-border-hover); }
-    .hist-info { display: flex; flex-direction: column; gap: 1px; }
-    .hist-doc { font-weight: 600; font-size: 0.85rem; }
-    .hist-meta { font-size: 0.72rem; color: var(--text-muted); }
-    .hist-score { font-size: 1.2rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+    .hist-item:hover { border-color: var(--glass-border-hover); background: var(--bg-surface-2); }
+    .hist-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; overflow: hidden; }
+    .hist-doc { font-weight: 600; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; color: var(--text-primary); }
+    .hist-meta { font-size: 0.74rem; color: var(--text-muted); }
+    .hist-score { font-size: 1.15rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; flex-shrink: 0; }
+    .hist-right-side { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+
+    @media (max-width: 600px) {
+      .hist-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .hist-right-side { width: 100%; justify-content: space-between; border-top: 1px solid var(--glass-border); padding-top: 8px; margin-top: 2px; }
+    }
 
     /* ── Ask Tutor Panel ── */
     .ask-fab {
@@ -664,24 +671,25 @@
     /* ── ChatGPT Style Ask Tutor ── */
     .ask-chat-container {
       display: flex; flex-direction: column;
-      height: calc(100vh - 110px); max-height: 820px;
+      height: calc(100vh - 120px); max-height: 820px;
       padding: 0 !important; overflow: hidden;
+      background: var(--bg-surface); border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
     }
     .ask-header {
       padding: 14px 20px; border-bottom: 1px solid var(--glass-border);
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      background: rgba(0,0,0,0.25); flex-shrink: 0;
+      background: rgba(0,0,0,0.2); flex-shrink: 0; flex-wrap: wrap;
     }
     .ask-header-left { display: flex; align-items: center; gap: 12px; }
     .tutor-avatar-icon {
-      width: 38px; height: 38px; border-radius: 10px;
-      background: var(--accent-gradient); display: flex;
-      align-items: center; justify-content: center; font-size: 1.2rem;
-      box-shadow: 0 0 15px var(--accent-glow);
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--accent-soft); border: 1px solid var(--glass-border); display: flex;
+      align-items: center; justify-content: center; color: var(--accent-light);
     }
     .tutor-status-subtitle { font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
     .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--correct); display: inline-block; box-shadow: 0 0 8px var(--correct); }
-    .ask-header-right { display: flex; align-items: center; gap: 10px; }
+    .ask-header-right { display: flex; align-items: center; gap: 10px; max-width: 100%; }
 
     .ask-messages {
       flex: 1; overflow-y: auto; padding: 20px; display: flex;
@@ -797,13 +805,13 @@
       <div class="sidebar-user" id="sidebarUser" style="padding:14px; border-top:1px solid var(--glass-border); margin-top:auto;">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
           <div style="display:flex; align-items:center; gap:10px; overflow:hidden;">
-            <div id="userAvatarEl" style="width:34px; height:34px; border-radius:50%; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; color:var(--accent-light); flex-shrink:0;">👤</div>
+            <div id="userAvatarEl" style="width:32px; height:32px; border-radius:50%; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; color:var(--accent-light); flex-shrink:0;">U</div>
             <div style="overflow:hidden;">
               <div id="userNameEl" style="font-size:0.82rem; font-weight:600; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">Guest User</div>
               <div id="userStatusEl" style="font-size:0.68rem; color:var(--text-muted); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">Sign in to sync</div>
             </div>
           </div>
-          <button id="btnAuthAction" onclick="handleUserAuthBtn()" class="btn btn-ghost" style="padding:6px; font-size:0.8rem;" title="Sign In">🔑</button>
+          <button id="btnAuthAction" onclick="handleUserAuthBtn()" class="btn btn-ghost" style="padding:6px 10px; font-size:0.78rem;" title="Sign In">Sign In</button>
         </div>
       </div>
     </nav>
@@ -823,13 +831,13 @@
         <p>Drop a course PDF and let your personal tutor create quizzes, flashcards, and answer your questions</p>
       </div>
       <div class="drop-zone" id="dropZone">
-        <span class="drop-icon">📄</span>
+        <span class="drop-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 12 15 15"></polyline></svg></span>
         <h3>Drop your PDF here</h3>
         <p>or click to browse</p>
         <input type="file" accept=".pdf,application/pdf" id="fileInput" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
       </div>
       <div class="file-info" id="fileInfo">
-        <span class="file-icon">📑</span>
+        <span class="file-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg></span>
         <div class="file-details"><h4 id="fileName">—</h4><p id="filePages">—</p></div>
       </div>
       <div class="extraction-progress" id="extractionProgress">
@@ -837,21 +845,23 @@
         <p class="progress-label" id="extractionLabel">Extracting…</p>
       </div>
       <div id="resumeContainer" style="display:none; margin-top: 24px;">
-        <div class="card card-glow" style="border: 1px solid var(--accent-glow); background: linear-gradient(135deg, rgba(108,92,231,0.08), rgba(19,19,37,0.85)); padding: 20px 24px;">
+        <div style="border: 1px solid var(--accent-glow); background: linear-gradient(135deg, rgba(108,92,231,0.08), rgba(19,19,37,0.85)); padding: 20px 24px; border-radius: var(--radius);">
           <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;">
             <div style="display:flex; align-items:center; gap:14px;">
-              <div style="width:44px; height:44px; border-radius:12px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-size:1.4rem; border:1px solid hsla(var(--accent-h),75%,60%,0.2);">⚡</div>
+              <div style="width:40px; height:40px; border-radius:10px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; border:1px solid hsla(var(--accent-h),75%,60%,0.2); color:var(--accent-light);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              </div>
               <div>
                 <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                   <h4 style="font-size:0.95rem; font-weight:700;" id="resumeTitle">Resume Active Session</h4>
-                  <span class="doc-badge" style="font-size:0.68rem; padding:3px 9px;">📄 <span id="resumeFileName">—</span></span>
+                  <span class="doc-badge" style="font-size:0.68rem; padding:3px 9px;" id="resumeFileName">—</span>
                 </div>
                 <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:3px;" id="resumeSubtext">Session in progress</p>
               </div>
             </div>
             <div style="display:flex; gap:10px; align-items:center;">
-              <button class="btn btn-primary btn-lg" onclick="resumeActiveSession()" style="padding:10px 22px;">▶ Continue</button>
-              <button class="btn btn-ghost" onclick="discardSessionAndNew()" style="font-size:0.82rem; padding:8px 12px; color:var(--text-muted);" title="Reset Session">🗑 Reset</button>
+              <button class="btn btn-primary btn-lg" onclick="resumeActiveSession()" style="padding:10px 22px;">Continue →</button>
+              <button class="btn btn-ghost" onclick="discardSessionAndNew()" style="font-size:0.82rem; padding:8px 12px; color:var(--text-muted);" title="Reset Session">Reset</button>
             </div>
           </div>
         </div>
@@ -867,12 +877,10 @@
         </div>
         <div class="mode-selector">
           <button class="mode-card active" id="modeQuiz" onclick="selectMode('quiz')">
-            <span class="mode-icon">🧠</span>
             <div class="mode-title">Quiz</div>
             <div class="mode-desc">Exam-style questions, graded with readiness score</div>
           </button>
           <button class="mode-card" id="modeFlashcard" onclick="selectMode('flashcard')">
-            <span class="mode-icon">🃏</span>
             <div class="mode-title">Flashcards</div>
             <div class="mode-desc">Flip through concepts, self-assess knowledge</div>
           </button>
@@ -893,7 +901,7 @@
         </div>
         <div class="config-actions">
           <button class="btn btn-ghost" onclick="showScreen('upload')">← Back</button>
-          <button class="btn btn-primary btn-lg" id="btnStart" onclick="startSession()">🧠 Start Quiz</button>
+          <button class="btn btn-primary btn-lg" id="btnStart" onclick="startSession()">Start Quiz</button>
         </div>
       </div>
     </section>
@@ -1001,48 +1009,44 @@
 
     <!-- HISTORY -->
     <section class="screen" id="screenHistory">
-      <div class="card card-glow">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-          <h2 style="font-size:1.15rem;">📊 History</h2>
-          <button class="btn btn-ghost" onclick="showScreen('upload')">← Back</button>
-        </div>
-        <div id="historyContainer"><div class="history-empty">No quizzes yet — upload a PDF to begin</div></div>
-        <div style="text-align:center;margin-top:14px;">
-          <button class="btn btn-ghost" id="btnClearHistory" style="display:none;color:var(--incorrect);font-size:0.8rem;" onclick="clearHistory()">🗑 Clear</button>
-        </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <h2 style="font-size:1.25rem; font-weight:800;">History</h2>
+        <button class="btn btn-ghost" onclick="showScreen('upload')">← Back</button>
+      </div>
+      <div id="historyContainer"><div class="history-empty">No quizzes yet — upload a PDF to begin</div></div>
+      <div style="text-align:center;margin-top:16px;">
+        <button class="btn btn-ghost" id="btnClearHistory" style="display:none;color:var(--incorrect);font-size:0.8rem;" onclick="clearHistory()">Clear History</button>
       </div>
     </section>
 
     <!-- HISTORY DETAIL REVIEW -->
     <section class="screen" id="screenHistoryDetail">
-      <div class="card card-glow">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-          <div>
-            <span class="doc-badge" style="font-size:0.7rem;" id="histDetailDoc">📄 —</span>
-            <h2 style="font-size:1.2rem;margin-top:4px;" id="histDetailTitle">Quiz Review</h2>
-            <p style="font-size:0.75rem;color:var(--text-muted);" id="histDetailDate">—</p>
-          </div>
-          <button class="btn btn-ghost" onclick="showScreen('history')">← Back to History</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+        <div>
+          <span class="doc-badge" style="font-size:0.7rem;" id="histDetailDoc">—</span>
+          <h2 style="font-size:1.25rem;font-weight:800;margin-top:4px;" id="histDetailTitle">Quiz Review</h2>
+          <p style="font-size:0.75rem;color:var(--text-muted);" id="histDetailDate">—</p>
         </div>
+        <button class="btn btn-ghost" onclick="showScreen('history')">← Back to History</button>
+      </div>
 
-        <div class="results-hero" style="padding:10px 0 20px;">
-          <div class="readiness ready" id="histDetailBadge">🎯 Exam Ready</div>
-          <div class="stats-row">
-            <div class="stat-box"><div class="sv" style="color:var(--correct)" id="histDetailScore">0%</div><div class="sl">Score</div></div>
-            <div class="stat-box"><div class="sv" style="color:var(--correct)" id="histDetailCorrect">0</div><div class="sl">Correct</div></div>
-            <div class="stat-box"><div class="sv" style="color:var(--accent-light)" id="histDetailTotal">0</div><div class="sl">Total</div></div>
-          </div>
+      <div class="results-hero" style="padding:10px 0 20px;">
+        <div class="readiness ready" id="histDetailBadge">Exam Ready</div>
+        <div class="stats-row">
+          <div class="stat-box"><div class="sv" style="color:var(--correct)" id="histDetailScore">0%</div><div class="sl">Score</div></div>
+          <div class="stat-box"><div class="sv" style="color:var(--correct)" id="histDetailCorrect">0</div><div class="sl">Correct</div></div>
+          <div class="stat-box"><div class="sv" style="color:var(--accent-light)" id="histDetailTotal">0</div><div class="sl">Total</div></div>
         </div>
+      </div>
 
-        <div class="tutor-section" id="histTutorSection" style="display:none;">
-          <div class="tutor-header"><h3>📖 Saved Tutor Notes</h3><span class="tutor-tag">AI Tutor</span></div>
-          <div id="histTutorContainer"></div>
-        </div>
+      <div class="tutor-section" id="histTutorSection" style="display:none;">
+        <div class="tutor-header"><h3>Tutor Notes</h3><span class="tutor-tag">AI Tutor</span></div>
+        <div id="histTutorContainer"></div>
+      </div>
 
-        <div class="review-section">
-          <h3>📝 Detailed Question Breakdown</h3>
-          <div id="histReviewContainer"></div>
-        </div>
+      <div class="review-section">
+        <h3>Question Review</h3>
+        <div id="histReviewContainer"></div>
       </div>
     </section>
 
@@ -1090,10 +1094,10 @@
     </section>
       <!-- ASK TUTOR PAGE -->
       <section class="screen" id="screenAskTutor">
-        <div class="card card-glow ask-chat-container">
+        <div class="ask-chat-container">
           <div class="ask-header">
             <div class="ask-header-left">
-              <div class="tutor-avatar-icon">🤖</div>
+              <div class="tutor-avatar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
               <div>
                 <h2 style="font-size:1.05rem; font-weight:700;">AI Tutor</h2>
                 <div class="tutor-status-subtitle">
@@ -1102,21 +1106,20 @@
               </div>
             </div>
             <div class="ask-header-right">
-              <div class="doc-badge" id="askDocBadge">📄 <span id="askDocName">General Mode (No PDF)</span></div>
-              <button class="btn btn-ghost" onclick="clearChat()" title="Clear Chat History" style="font-size:0.8rem; padding: 6px 10px;">🗑 Clear</button>
+              <div class="doc-badge" id="askDocBadge" style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><span id="askDocName">General Mode</span></div>
+              <button class="btn btn-ghost" onclick="clearChat()" title="Clear Chat History" style="font-size:0.8rem; padding: 6px 10px;">Clear</button>
             </div>
           </div>
 
           <div class="ask-messages" id="askMessages">
             <div class="ask-empty" id="askEmptyState">
               <div class="ask-welcome">
-                <div class="welcome-icon">💬</div>
                 <h3>Ask Your AI Tutor Anything</h3>
-                <p>Ground answers in your course PDF or ask any general academic questions!</p>
+                <p>Ground answers in your course PDF or ask any general academic questions.</p>
                 <div class="quick-prompts">
-                  <button class="prompt-chip" onclick="sendQuickPrompt('Explain the key concepts of this material')">💡 Key Concepts</button>
-                  <button class="prompt-chip" onclick="sendQuickPrompt('Give me a quick summary of the main points')">📝 Quick Summary</button>
-                  <button class="prompt-chip" onclick="sendQuickPrompt('What are some real-world applications of this topic?')">🌐 Real-World Examples</button>
+                  <button class="prompt-chip" onclick="sendQuickPrompt('Explain the key concepts of this material')">Key Concepts</button>
+                  <button class="prompt-chip" onclick="sendQuickPrompt('Give me a quick summary of the main points')">Quick Summary</button>
+                  <button class="prompt-chip" onclick="sendQuickPrompt('What are some real-world applications of this topic?')">Real-World Examples</button>
                 </div>
               </div>
             </div>
@@ -1237,12 +1240,12 @@
             avatarEl.textContent = dName.charAt(0).toUpperCase();
           }
         }
-        if (btnEl) { btnEl.textContent = '🚪'; btnEl.title = 'Sign Out'; }
+        if (btnEl) { btnEl.textContent = 'Sign Out'; btnEl.title = 'Sign Out'; }
       } else {
         if (nameEl) nameEl.textContent = 'Guest User';
         if (statusEl) statusEl.textContent = 'Sign in to sync';
-        if (avatarEl) avatarEl.textContent = '👤';
-        if (btnEl) { btnEl.textContent = '🔑'; btnEl.title = 'Sign In'; }
+        if (avatarEl) avatarEl.textContent = 'U';
+        if (btnEl) { btnEl.textContent = 'Sign In'; btnEl.title = 'Sign In'; }
       }
     }
 
@@ -1791,9 +1794,9 @@
       setTimeout(() => { ring.style.strokeDashoffset = off; ring.style.stroke = pct >= 80 ? 'var(--correct)' : pct >= 50 ? 'var(--warning)' : 'var(--incorrect)'; }, 100);
       animateVal('scorePercent', 0, pct, 1200, '%');
       var badge = document.getElementById('readinessBadge');
-      if (pct >= 80) { badge.className = 'readiness ready'; badge.textContent = '🎯 Exam Ready!'; }
-      else if (pct >= 50) { badge.className = 'readiness almost'; badge.textContent = '📖 Almost There'; }
-      else { badge.className = 'readiness not-ready'; badge.textContent = '📚 Keep Studying'; }
+      if (pct >= 80) { badge.className = 'readiness ready'; badge.textContent = 'Exam Ready'; }
+      else if (pct >= 50) { badge.className = 'readiness almost'; badge.textContent = 'Almost There'; }
+      else { badge.className = 'readiness not-ready'; badge.textContent = 'Keep Studying'; }
       document.getElementById('statCorrect').textContent = cc;
       document.getElementById('statIncorrect').textContent = ic;
       document.getElementById('statTotal').textContent = total;
@@ -1801,9 +1804,9 @@
       quizData.forEach((q, i) => {
         var r = gradingResults[i];
         var vc = r.correct ? 'rev-correct' : r.partial ? 'rev-partial' : 'rev-incorrect';
-        var vt = r.correct ? '✓' : r.partial ? '~' : '✗';
+        var vt = r.correct ? 'Correct' : r.partial ? 'Partial' : 'Incorrect';
         var tp = q.topic ? '<span class="q-topic" style="margin:0 0 6px">' + esc(q.topic) + '</span>' : '';
-        rh += '<div class="rev-card"><div class="rev-header"><span class="rev-num">Q' + (i + 1) + ' · ' + q.type.replace('_', ' ') + '</span><span class="rev-badge ' + vc + '">' + vt + '</span></div>' + tp + '<p class="rev-q">' + esc(q.question) + '</p><div class="rev-ans rev-yours"><div class="ans-label">You</div>' + esc(userAnswers[i] || '(blank)') + '</div><div class="rev-ans rev-right"><div class="ans-label">Answer</div>' + esc(q.correct_answer) + '</div><div class="rev-explain">💡 ' + esc(r.explanation || q.explanation || r.feedback) + '</div></div>';
+        rh += '<div class="rev-card"><div class="rev-header"><span class="rev-num">Q' + (i + 1) + ' · ' + q.type.replace('_', ' ') + '</span><span class="rev-badge ' + vc + '">' + vt + '</span></div>' + tp + '<p class="rev-q">' + esc(q.question) + '</p><div class="rev-ans rev-yours"><div class="ans-label">You</div>' + esc(userAnswers[i] || '(blank)') + '</div><div class="rev-ans rev-right"><div class="ans-label">Answer</div>' + esc(q.correct_answer) + '</div><div class="rev-explain">Explanation: ' + esc(r.explanation || q.explanation || r.feedback) + '</div></div>';
       });
       document.getElementById('reviewContainer').innerHTML = rh;
       var wrong = []; gradingResults.forEach((r, i) => { if (!r.correct) wrong.push(i); });
@@ -1900,9 +1903,9 @@
       var h = '';
       askHistory.forEach(m => {
         if (m.role === 'user') {
-          h += '<div class="chat-row user-row"><div class="chat-bubble">' + esc(m.text) + '</div><div class="chat-avatar user-avatar">👤</div></div>';
+          h += '<div class="chat-row user-row"><div class="chat-bubble">' + esc(m.text) + '</div><div class="chat-avatar user-avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div></div>';
         } else {
-          h += '<div class="chat-row tutor-row"><div class="chat-avatar tutor-avatar">🤖</div><div class="chat-bubble">' + formatMarkdown(m.text) + '</div></div>';
+          h += '<div class="chat-row tutor-row"><div class="chat-avatar tutor-avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div><div class="chat-bubble">' + formatMarkdown(m.text) + '</div></div>';
         }
       });
       if (h) {
@@ -2032,7 +2035,7 @@
       c.innerHTML = h.map(x => {
         var d = new Date(x.date), ds = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), ts = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         var sc = x.score >= 80 ? 'var(--correct)' : x.score >= 50 ? 'var(--warning)' : 'var(--incorrect)';
-        return '<div class="hist-item" onclick="viewHistoryDetail(\'' + x.id + '\')" style="cursor:pointer;" title="Click to view detailed quiz review"><div class="hist-info"><span class="hist-doc">📄 ' + esc(x.docName) + '</span><span class="hist-meta">' + ds + ' · ' + x.correct + '/' + x.total + '</span></div><div style="display:flex;align-items:center;gap:12px;"><span class="hist-score" style="color:' + sc + '">' + x.score + '%</span><span style="font-size:0.75rem;color:var(--accent-light);">Review →</span></div></div>';
+        return '<div class="hist-item" onclick="viewHistoryDetail(\'' + x.id + '\')" style="cursor:pointer;" title="Click to view detailed quiz review"><div class="hist-info"><span class="hist-doc">' + esc(x.docName) + '</span><span class="hist-meta">' + ds + ' · ' + x.correct + '/' + x.total + ' questions</span></div><div class="hist-right-side"><span class="hist-score" style="color:' + sc + '">' + x.score + '%</span><span style="font-size:0.75rem;color:var(--accent-light);font-weight:600;">Review →</span></div></div>';
       }).join('');
     }
 
