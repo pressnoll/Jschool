@@ -774,23 +774,23 @@
     <nav class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="logo">
-          <div class="logo-mark">📚</div>
+          <div class="logo-mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>
           <span>JSchool</span>
         </div>
         <button class="mobile-close" onclick="toggleSidebar()">✕</button>
       </div>
       <div class="sidebar-links">
         <button class="side-link active" id="linkStudy" onclick="showScreen('upload', this)">
-          <span class="icon">🏠</span> Study Area
+          <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></span> Study Area
         </button>
         <button class="side-link" id="linkAsk" onclick="showScreen('askTutor', this)">
-          <span class="icon">💬</span> Ask Tutor
+          <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span> Ask Tutor
         </button>
         <button class="side-link" id="linkHistory" onclick="showScreen('history', this)">
-          <span class="icon">📊</span> History
+          <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></span> History
         </button>
         <button class="side-link" id="linkSettings" onclick="showScreen('settings', this)">
-          <span class="icon">⚙️</span> Settings
+          <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span> Settings
         </button>
       </div>
 
@@ -1199,6 +1199,7 @@
         updateUserUI();
         if (user) {
           syncHistoryFromFirestore();
+          syncChatFromFirestore();
           db.collection('users').doc(user.uid).set({
             uid: user.uid,
             email: user.email || '',
@@ -1206,6 +1207,15 @@
             photoURL: user.photoURL || '',
             lastActive: firebase.firestore.FieldValue.serverTimestamp()
           }, { merge: true }).catch(console.error);
+
+          // If on auth screen, auto-advance to upload
+          var activeEl = document.querySelector('.screen.active');
+          if (activeEl && activeEl.id === 'screenAuth') {
+            showScreen('upload');
+          }
+        } else {
+          // Lock to Auth screen if signed out
+          showScreen('auth');
         }
       });
     }
@@ -1416,18 +1426,27 @@
       }
     }
 
-    // ── Screens ──
-    function showScreen(id, linkEl) {
+    // ── Screens & SPA History Routing ──
+    function showScreen(id, linkEl, isPop) {
+      if (!currentUser && id !== 'auth') {
+        id = 'auth';
+      }
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       var s = document.getElementById('screen' + id.charAt(0).toUpperCase() + id.slice(1));
       if (s) s.classList.add('active');
-      
+
+      if (!isPop) {
+        try {
+          window.history.pushState({ screenId: id }, '', '#' + id);
+        } catch(e) {}
+      }
+
       // Update sidebar links
       document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
       if (linkEl) {
         linkEl.classList.add('active');
       } else {
-        var map = { 'upload': 'linkStudy', 'config': 'linkStudy', 'quiz': 'linkStudy', 'flashcards': 'linkStudy', 'results': 'linkStudy', 'history': 'linkHistory', 'settings': 'linkSettings', 'askTutor': 'linkAsk' };
+        var map = { 'upload': 'linkStudy', 'config': 'linkStudy', 'quiz': 'linkStudy', 'flashcards': 'linkStudy', 'results': 'linkStudy', 'history': 'linkHistory', 'historyDetail': 'linkHistory', 'settings': 'linkSettings', 'askTutor': 'linkAsk' };
         var l = document.getElementById(map[id]);
         if (l) l.classList.add('active');
       }
@@ -1440,6 +1459,11 @@
       var sb = document.getElementById('sidebar'); if (sb) sb.classList.remove('open');
       var so = document.getElementById('sidebarOverlay'); if (so) so.classList.remove('show');
     }
+
+    window.addEventListener('popstate', (e) => {
+      var sid = (e.state && e.state.screenId) || (location.hash ? location.hash.substring(1) : (currentUser ? 'upload' : 'auth'));
+      showScreen(sid, null, true);
+    });
     
     function toggleSidebar() {
       var sb = document.getElementById('sidebar'); if (sb) sb.classList.toggle('open');
@@ -1464,16 +1488,13 @@
       localStorage.setItem('jschool_openrouter_key', k); updateKeyStatus(); toast('Key saved ✓');
     }
     function getApiKey() {
-      var p1 = 'sk-or-v1-';
-      var p2 = '985a2d76a81aecf6f49bf5cf6e94d439';
-      var p3 = 'c9288e2864e084b05aa784e0e17de711';
-      return localStorage.getItem('jschool_openrouter_key') || (p1 + p2 + p3);
+      return localStorage.getItem('jschool_openrouter_key') || '';
     }
     function updateKeyStatus() {
       var el = document.getElementById('keyStatus');
       var userKey = localStorage.getItem('jschool_openrouter_key');
-      if (userKey) { el.className = 'key-status saved'; el.textContent = '✓ Custom Key'; }
-      else { el.className = 'key-status saved'; el.textContent = '⚡ Default Key Active'; }
+      if (userKey) { el.className = 'key-status saved'; el.textContent = '✓ Saved'; }
+      else { el.className = 'key-status missing'; el.textContent = '✗ Not set'; }
     }
 
     // ── Upload ──
@@ -1828,6 +1849,24 @@
     
     function saveChatHistory() {
       localStorage.setItem('jschool_chat_history', JSON.stringify(askHistory));
+      if (currentUser) {
+        db.collection('users').doc(currentUser.uid).collection('chats').doc('session').set({
+          history: askHistory,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(console.error);
+      }
+    }
+
+    async function syncChatFromFirestore() {
+      if (!currentUser) return;
+      try {
+        var doc = await db.collection('users').doc(currentUser.uid).collection('chats').doc('session').get();
+        if (doc.exists && doc.data().history) {
+          askHistory = doc.data().history;
+          localStorage.setItem('jschool_chat_history', JSON.stringify(askHistory));
+          renderChatHistory();
+        }
+      } catch(e) { console.error('Chat sync error:', e); }
     }
 
     function sendQuickPrompt(txt) {
