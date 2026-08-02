@@ -506,19 +506,13 @@
       padding: 16px 20px; background: var(--bg-surface);
       border: 1px solid var(--glass-border); border-radius: var(--radius-sm);
       margin-bottom: 10px; transition: var(--transition); gap: 14px;
-      max-width: 100%; overflow: hidden;
+      max-width: 100%; overflow: hidden; cursor: pointer;
     }
     .hist-item:hover { border-color: var(--glass-border-hover); background: var(--bg-surface-2); }
     .hist-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; overflow: hidden; }
-    .hist-doc { font-weight: 600; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; color: var(--text-primary); }
-    .hist-meta { font-size: 0.74rem; color: var(--text-muted); }
-    .hist-score { font-size: 1.15rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; flex-shrink: 0; }
+    .hist-doc { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; color: var(--text-primary); }
+    .hist-meta { font-size: 0.76rem; color: var(--text-muted); }
     .hist-right-side { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-
-    @media (max-width: 600px) {
-      .hist-item { flex-direction: column; align-items: flex-start; gap: 8px; }
-      .hist-right-side { width: 100%; justify-content: space-between; border-top: 1px solid var(--glass-border); padding-top: 8px; margin-top: 2px; }
-    }
 
     /* ── Ask Tutor Panel ── */
     .ask-fab {
@@ -1097,13 +1091,11 @@
         <div class="ask-chat-container">
           <div class="ask-header">
             <div class="ask-header-left">
-              <div class="tutor-avatar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
-              <div>
-                <h2 style="font-size:1.05rem; font-weight:700;">AI Tutor</h2>
-                <div class="tutor-status-subtitle">
-                  <span class="status-dot"></span> <span id="tutorModeStatus">Ready · PDF & General Knowledge</span>
-                </div>
-              </div>
+              <button class="btn btn-ghost" onclick="showScreen('history')" title="View History" style="padding:6px 10px; display:flex; align-items:center; gap:6px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                <span style="font-size:0.8rem; font-weight:600;">History</span>
+              </button>
+              <h2 style="font-size:1.05rem; font-weight:700; margin-left:6px;">AI Tutor</h2>
             </div>
             <div class="ask-header-right">
               <div class="doc-badge" id="askDocBadge" style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><span id="askDocName">General Mode</span></div>
@@ -1114,8 +1106,8 @@
           <div class="ask-messages" id="askMessages">
             <div class="ask-empty" id="askEmptyState">
               <div class="ask-welcome">
-                <h3>Ask Your AI Tutor Anything</h3>
-                <p>Ground answers in your course PDF or ask any general academic questions.</p>
+                <h3 style="font-size:1.3rem; font-weight:700; margin-bottom:8px;">Ask Your AI Tutor Anything</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:20px;">Ground answers in your course PDF or ask any general concept.</p>
                 <div class="quick-prompts">
                   <button class="prompt-chip" onclick="sendQuickPrompt('Explain the key concepts of this material')">Key Concepts</button>
                   <button class="prompt-chip" onclick="sendQuickPrompt('Give me a quick summary of the main points')">Quick Summary</button>
@@ -1127,12 +1119,11 @@
 
           <div class="ask-input-wrapper">
             <div class="ask-input-box">
-              <textarea id="askInput" placeholder="Ask anything about your material or any general concept…" rows="1" onkeydown="handleAskKeyDown(event)"></textarea>
+              <textarea id="askInput" placeholder="Ask anything about your material or concept…" rows="1" onkeydown="handleAskKeyDown(event)"></textarea>
               <button class="ask-send-btn" id="askSendBtn" onclick="askQuestion()" title="Send message">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
               </button>
             </div>
-            <div class="ask-disclaimer">Tutor provides answers grounded in your PDF and general LLM knowledge.</div>
           </div>
         </div>
       </section>
@@ -1903,9 +1894,9 @@
       var h = '';
       askHistory.forEach(m => {
         if (m.role === 'user') {
-          h += '<div class="chat-row user-row"><div class="chat-bubble">' + esc(m.text) + '</div><div class="chat-avatar user-avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div></div>';
+          h += '<div class="chat-row user-row"><div class="chat-bubble">' + esc(m.text) + '</div></div>';
         } else {
-          h += '<div class="chat-row tutor-row"><div class="chat-avatar tutor-avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div><div class="chat-bubble">' + formatMarkdown(m.text) + '</div></div>';
+          h += '<div class="chat-row tutor-row"><div class="chat-bubble">' + formatMarkdown(m.text) + '</div></div>';
         }
       });
       if (h) {
@@ -1938,8 +1929,8 @@
 
       askHistory.push({ role: 'user', text: q });
       
-      msgs.innerHTML += '<div class="chat-row user-row"><div class="chat-bubble">' + esc(q) + '</div><div class="chat-avatar user-avatar">👤</div></div>';
-      msgs.innerHTML += '<div class="chat-row tutor-row" id="askTyping"><div class="chat-avatar tutor-avatar">🤖</div><div class="chat-bubble typing"><span class="mini-spinner"></span> Thinking…</div></div>';
+      msgs.innerHTML += '<div class="chat-row user-row"><div class="chat-bubble">' + esc(q) + '</div></div>';
+      msgs.innerHTML += '<div class="chat-row tutor-row" id="askTyping"><div class="chat-bubble typing"><span class="mini-spinner"></span> Thinking…</div></div>';
       msgs.scrollTop = msgs.scrollHeight;
       saveChatHistory();
 
@@ -1957,11 +1948,11 @@
         var response = await callOpenRouter(apiKey, q, sysPrompt);
         var typing = document.getElementById('askTyping'); if (typing) typing.remove();
         askHistory.push({ role: 'tutor', text: response });
-        msgs.innerHTML += '<div class="chat-row tutor-row"><div class="chat-avatar tutor-avatar">🤖</div><div class="chat-bubble">' + formatMarkdown(response) + '</div></div>';
+        msgs.innerHTML += '<div class="chat-row tutor-row"><div class="chat-bubble">' + formatMarkdown(response) + '</div></div>';
         saveChatHistory();
       } catch (err) {
         var typing = document.getElementById('askTyping'); if (typing) typing.remove();
-        msgs.innerHTML += '<div class="chat-row tutor-row"><div class="chat-avatar tutor-avatar">🤖</div><div class="chat-bubble" style="color:var(--incorrect)">⚠️ ' + esc(err.message) + '</div></div>';
+        msgs.innerHTML += '<div class="chat-row tutor-row"><div class="chat-bubble" style="color:var(--incorrect)">' + esc(err.message) + '</div></div>';
       }
       
       input.disabled = false;
@@ -2030,12 +2021,11 @@
 
     function renderHistory() {
       var h = getHistory(), c = document.getElementById('historyContainer'), cb = document.getElementById('btnClearHistory');
-      if (!h.length) { c.innerHTML = '<div class="history-empty">No quizzes yet — upload a PDF to begin</div>'; cb.style.display = 'none'; return; }
+      if (!h.length) { c.innerHTML = '<div class="history-empty">No history available — complete a quiz to begin</div>'; cb.style.display = 'none'; return; }
       cb.style.display = 'inline-flex';
       c.innerHTML = h.map(x => {
-        var d = new Date(x.date), ds = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), ts = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-        var sc = x.score >= 80 ? 'var(--correct)' : x.score >= 50 ? 'var(--warning)' : 'var(--incorrect)';
-        return '<div class="hist-item" onclick="viewHistoryDetail(\'' + x.id + '\')" style="cursor:pointer;" title="Click to view detailed quiz review"><div class="hist-info"><span class="hist-doc">' + esc(x.docName) + '</span><span class="hist-meta">' + ds + ' · ' + x.correct + '/' + x.total + ' questions</span></div><div class="hist-right-side"><span class="hist-score" style="color:' + sc + '">' + x.score + '%</span><span style="font-size:0.75rem;color:var(--accent-light);font-weight:600;">Review →</span></div></div>';
+        var d = new Date(x.date), ds = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        return '<div class="hist-item" onclick="viewHistoryDetail(\'' + x.id + '\')" style="cursor:pointer;" title="Click to view detailed quiz review"><div class="hist-info"><span class="hist-doc">' + esc(x.docName || 'Course Document') + '</span><span class="hist-meta">' + ds + '</span></div><div class="hist-right-side"><span style="font-size:0.8rem;color:var(--text-muted);font-weight:500;">View →</span></div></div>';
       }).join('');
     }
 
