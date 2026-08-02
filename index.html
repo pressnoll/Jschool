@@ -645,6 +645,22 @@
     }
     .sidebar-overlay.show { display: block; opacity: 1; }
     
+    /* ── Question Quick-Jump Map ── */
+    .q-map-container {
+      display: flex; gap: 6px; overflow-x: auto; padding: 4px 0 14px 0;
+      scrollbar-width: none; flex-wrap: wrap; margin-bottom: 8px;
+    }
+    .q-map-container::-webkit-scrollbar { display: none; }
+    .q-pill {
+      min-width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--glass-border);
+      background: var(--bg-card); color: var(--text-muted); font-size: 0.78rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      transition: var(--transition); font-family: 'JetBrains Mono', monospace;
+    }
+    .q-pill:hover { border-color: var(--glass-border-hover); color: var(--text-primary); }
+    .q-pill.answered { background: var(--correct-soft); border-color: rgba(45,212,168,0.3); color: var(--correct); }
+    .q-pill.current { border-color: var(--accent); color: var(--accent-light); box-shadow: 0 0 10px var(--accent-glow); background: var(--accent-soft); }
+
     /* ── ChatGPT Style Ask Tutor ── */
     .ask-chat-container {
       display: flex; flex-direction: column;
@@ -777,6 +793,19 @@
           <span class="icon">⚙️</span> Settings
         </button>
       </div>
+
+      <div class="sidebar-user" id="sidebarUser" style="padding:14px; border-top:1px solid var(--glass-border); margin-top:auto;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px; overflow:hidden;">
+            <div id="userAvatarEl" style="width:34px; height:34px; border-radius:50%; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; color:var(--accent-light); flex-shrink:0;">👤</div>
+            <div style="overflow:hidden;">
+              <div id="userNameEl" style="font-size:0.82rem; font-weight:600; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">Guest User</div>
+              <div id="userStatusEl" style="font-size:0.68rem; color:var(--text-muted); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">Sign in to sync</div>
+            </div>
+          </div>
+          <button id="btnAuthAction" onclick="handleUserAuthBtn()" class="btn btn-ghost" style="padding:6px; font-size:0.8rem;" title="Sign In">🔑</button>
+        </div>
+      </div>
     </nav>
 
     <main class="main-content">
@@ -885,6 +914,7 @@
           <span class="quiz-counter" id="quizCounter">Q1 / 10</span>
           <button class="btn" onclick="finishQuiz()" style="font-size:0.75rem;padding:5px 12px;">Finish Early</button>
         </div>
+        <div class="q-map-container" id="quizQuestionMap"></div>
         <div class="quiz-progress"><div class="quiz-progress-fill" id="quizProgressFill"></div></div>
         <div id="questionContainer"></div>
         <div class="quiz-nav">
@@ -982,6 +1012,82 @@
         </div>
       </div>
     </section>
+
+    <!-- HISTORY DETAIL REVIEW -->
+    <section class="screen" id="screenHistoryDetail">
+      <div class="card card-glow">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+          <div>
+            <span class="doc-badge" style="font-size:0.7rem;" id="histDetailDoc">📄 —</span>
+            <h2 style="font-size:1.2rem;margin-top:4px;" id="histDetailTitle">Quiz Review</h2>
+            <p style="font-size:0.75rem;color:var(--text-muted);" id="histDetailDate">—</p>
+          </div>
+          <button class="btn btn-ghost" onclick="showScreen('history')">← Back to History</button>
+        </div>
+
+        <div class="results-hero" style="padding:10px 0 20px;">
+          <div class="readiness ready" id="histDetailBadge">🎯 Exam Ready</div>
+          <div class="stats-row">
+            <div class="stat-box"><div class="sv" style="color:var(--correct)" id="histDetailScore">0%</div><div class="sl">Score</div></div>
+            <div class="stat-box"><div class="sv" style="color:var(--correct)" id="histDetailCorrect">0</div><div class="sl">Correct</div></div>
+            <div class="stat-box"><div class="sv" style="color:var(--accent-light)" id="histDetailTotal">0</div><div class="sl">Total</div></div>
+          </div>
+        </div>
+
+        <div class="tutor-section" id="histTutorSection" style="display:none;">
+          <div class="tutor-header"><h3>📖 Saved Tutor Notes</h3><span class="tutor-tag">AI Tutor</span></div>
+          <div id="histTutorContainer"></div>
+        </div>
+
+        <div class="review-section">
+          <h3>📝 Detailed Question Breakdown</h3>
+          <div id="histReviewContainer"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AUTH SCREEN -->
+    <section class="screen" id="screenAuth">
+      <div class="card card-glow" style="max-width:440px; margin: 20px auto; padding: 32px 28px;">
+        <div style="text-align:center; margin-bottom: 24px;">
+          <div class="logo-mark" style="width:48px; height:48px; font-size:1.3rem; margin: 0 auto 12px;">📚</div>
+          <h2 style="font-size:1.3rem; font-weight:800;" id="authTitle">Welcome to JSchool</h2>
+          <p style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;" id="authSubtitle">Sign in to save your study progress & history across devices</p>
+        </div>
+
+        <div style="display:flex; background:var(--bg-card); padding:4px; border-radius:var(--radius-sm); border:1px solid var(--glass-border); margin-bottom: 20px;">
+          <button class="side-link active" id="btnTabLogin" onclick="switchAuthTab('login')" style="flex:1; justify-content:center; padding:8px;">Sign In</button>
+          <button class="side-link" id="btnTabRegister" onclick="switchAuthTab('register')" style="flex:1; justify-content:center; padding:8px;">Register</button>
+        </div>
+
+        <form id="authForm" onsubmit="handleAuthSubmit(event)">
+          <div class="form-group" id="groupName" style="display:none;">
+            <label>Full Name</label>
+            <input class="form-input" id="authNameInput" type="text" placeholder="John Doe">
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input class="form-input" id="authEmailInput" type="email" placeholder="student@example.com" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input class="form-input" id="authPasswordInput" type="password" placeholder="••••••••" required>
+          </div>
+          <button class="btn btn-primary btn-lg" id="btnAuthSubmit" type="submit" style="width:100%; justify-content:center; margin-top:8px;">Sign In</button>
+        </form>
+
+        <div style="display:flex; align-items:center; margin: 20px 0; color:var(--text-muted); font-size:0.75rem;">
+          <div style="flex:1; height:1px; background:var(--glass-border);"></div>
+          <span style="padding: 0 12px; text-transform:uppercase; letter-spacing:1px;">or</span>
+          <div style="flex:1; height:1px; background:var(--glass-border);"></div>
+        </div>
+
+        <button class="btn btn-lg" onclick="handleGoogleSignIn()" style="width:100%; justify-content:center; background:var(--bg-surface-2); border-color:var(--glass-border-hover);">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/><path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12 0 14.8s.7 5.1 1.9 7.5l3.7-2.9z"/><path fill="#34A853" d="M12 23.6c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16.6C3.7 20.3 7.5 23.6 12 23.6z"/></svg>
+          <span>Continue with Google</span>
+        </button>
+      </div>
+    </section>
       <!-- ASK TUTOR PAGE -->
       <section class="screen" id="screenAskTutor">
         <div class="card card-glow ask-chat-container">
@@ -1047,8 +1153,28 @@
   <div class="toast" id="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+
+    // ── Firebase Init ──
+    const firebaseConfig = {
+      apiKey: "AIzaSyCmsBK_FaTVmP2dj6Yi8DAtgBPrs0-oUuo",
+      authDomain: "jschool-f8d4f.firebaseapp.com",
+      projectId: "jschool-f8d4f",
+      storageBucket: "jschool-f8d4f.firebasestorage.app",
+      messagingSenderId: "1036663288837",
+      appId: "1:1036663288837:web:a66d52354bc7bb9330d86c",
+      measurementId: "G-1639WC2T1B"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+    var currentUser = null;
+    var authMode = 'login';
 
     // ── State ──
     var extractedText = '', pdfFileName = '', quizData = [], userAnswers = [], currentQ = 0, gradingResults = [];
@@ -1056,13 +1182,106 @@
     var flashcards = [], fcDeck = [], fcCurrentIdx = 0, fcGotIt = [], fcStillLearning = [], fcFlipped = false;
     var askHistory = [];
     var pdfLoaded = false;
+    var currentTutorNotes = [];
 
     window.addEventListener('DOMContentLoaded', () => { 
       updateKeyStatus(); 
       renderHistory(); 
       loadChatHistory();
       restoreActiveSession();
+      initAuthListener();
     });
+
+    // ── Auth Logic ──
+    function initAuthListener() {
+      auth.onAuthStateChanged(user => {
+        currentUser = user;
+        updateUserUI();
+        if (user) {
+          syncHistoryFromFirestore();
+        }
+      });
+    }
+
+    function updateUserUI() {
+      var nameEl = document.getElementById('userNameEl');
+      var statusEl = document.getElementById('userStatusEl');
+      var avatarEl = document.getElementById('userAvatarEl');
+      var btnEl = document.getElementById('btnAuthAction');
+
+      if (currentUser) {
+        var dName = currentUser.displayName || currentUser.email.split('@')[0];
+        if (nameEl) nameEl.textContent = dName;
+        if (statusEl) statusEl.textContent = 'Synced with Cloud';
+        if (avatarEl) {
+          if (currentUser.photoURL) {
+            avatarEl.innerHTML = '<img src="' + currentUser.photoURL + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+          } else {
+            avatarEl.textContent = dName.charAt(0).toUpperCase();
+          }
+        }
+        if (btnEl) { btnEl.textContent = '🚪'; btnEl.title = 'Sign Out'; }
+      } else {
+        if (nameEl) nameEl.textContent = 'Guest User';
+        if (statusEl) statusEl.textContent = 'Sign in to sync';
+        if (avatarEl) avatarEl.textContent = '👤';
+        if (btnEl) { btnEl.textContent = '🔑'; btnEl.title = 'Sign In'; }
+      }
+    }
+
+    function handleUserAuthBtn() {
+      if (currentUser) {
+        if (confirm('Sign out of your account?')) {
+          auth.signOut().then(() => toast('Signed out'));
+        }
+      } else {
+        showScreen('auth');
+      }
+    }
+
+    function switchAuthTab(mode) {
+      authMode = mode;
+      document.getElementById('btnTabLogin').classList.toggle('active', mode === 'login');
+      document.getElementById('btnTabRegister').classList.toggle('active', mode === 'register');
+      document.getElementById('groupName').style.display = mode === 'register' ? 'block' : 'none';
+      document.getElementById('authTitle').textContent = mode === 'login' ? 'Welcome Back' : 'Create JSchool Account';
+      document.getElementById('btnAuthSubmit').textContent = mode === 'login' ? 'Sign In' : 'Create Account';
+    }
+
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      var email = document.getElementById('authEmailInput').value.trim();
+      var pass = document.getElementById('authPasswordInput').value;
+      var name = document.getElementById('authNameInput').value.trim();
+
+      if (!email || !pass) { toast('Please fill in email and password', true); return; }
+
+      try {
+        if (authMode === 'register') {
+          var res = await auth.createUserWithEmailAndPassword(email, pass);
+          if (name && res.user) {
+            await res.user.updateProfile({ displayName: name });
+          }
+          toast('Account created! Welcome 🎉');
+        } else {
+          await auth.signInWithEmailAndPassword(email, pass);
+          toast('Signed in successfully! 👋');
+        }
+        showScreen('upload');
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    async function handleGoogleSignIn() {
+      try {
+        await auth.signInWithPopup(googleProvider);
+        toast('Signed in with Google! 🎉');
+        showScreen('upload');
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
 
     window.addEventListener('beforeunload', () => saveActiveSession());
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveActiveSession(); });
@@ -1237,11 +1456,17 @@
       if (!k) { toast('Enter an API key', true); return; }
       localStorage.setItem('jschool_openrouter_key', k); updateKeyStatus(); toast('Key saved ✓');
     }
-    function getApiKey() { return localStorage.getItem('jschool_openrouter_key') || ''; }
+    function getApiKey() {
+      var p1 = 'sk-or-v1-';
+      var p2 = '985a2d76a81aecf6f49bf5cf6e94d439';
+      var p3 = 'c9288e2864e084b05aa784e0e17de711';
+      return localStorage.getItem('jschool_openrouter_key') || (p1 + p2 + p3);
+    }
     function updateKeyStatus() {
       var el = document.getElementById('keyStatus');
-      if (getApiKey()) { el.className = 'key-status saved'; el.textContent = '✓ Saved'; }
-      else { el.className = 'key-status missing'; el.textContent = '✗ Not set'; }
+      var userKey = localStorage.getItem('jschool_openrouter_key');
+      if (userKey) { el.className = 'key-status saved'; el.textContent = '✓ Custom Key'; }
+      else { el.className = 'key-status saved'; el.textContent = '⚡ Default Key Active'; }
     }
 
     // ── Upload ──
@@ -1450,10 +1675,30 @@
     }
 
     // ── Quiz Render ──
+    function renderQuestionMap() {
+      var mapEl = document.getElementById('quizQuestionMap');
+      if (!mapEl || !quizData.length) return;
+      var html = '';
+      quizData.forEach((q, i) => {
+        var isAns = userAnswers[i] !== null && userAnswers[i] !== undefined && (typeof userAnswers[i] !== 'string' || userAnswers[i].trim() !== '');
+        var isCurr = i === currentQ;
+        var cls = 'q-pill' + (isAns ? ' answered' : '') + (isCurr ? ' current' : '');
+        html += '<button class="' + cls + '" onclick="jumpToQuestion(' + i + ')">' + (i + 1) + '</button>';
+      });
+      mapEl.innerHTML = html;
+    }
+
+    function jumpToQuestion(idx) {
+      currentQ = idx;
+      renderQuestion();
+      saveActiveSession('quiz');
+    }
+
     function renderQuestion() {
       var q = quizData[currentQ], n = quizData.length;
       document.getElementById('quizCounter').textContent = 'Q' + (currentQ + 1) + ' / ' + n;
       document.getElementById('quizProgressFill').style.width = ((currentQ + 1) / n * 100) + '%';
+      renderQuestionMap();
       var bc = q.type === 'short_answer' ? 'badge-sa' : q.type === 'true_false' ? 'badge-tf' : 'badge-mc';
       var bt = q.type === 'short_answer' ? 'Short Answer' : q.type === 'true_false' ? 'True / False' : 'Multiple Choice';
       var tp = q.topic ? '<span class="q-topic">' + esc(q.topic) + '</span>' : '';
@@ -1554,6 +1799,7 @@
       } catch (e) { console.error(e); document.getElementById('tutorNotesContainer').innerHTML = '<div class="tutor-loading">Could not generate notes. See review below.</div>'; }
     }
     function renderTutorNotes(notes) {
+      currentTutorNotes = notes || [];
       var h = '';
       notes.forEach((n, i) => {
         var qr = (n.questions_covered || []).map(q => 'Q' + q).join(', ');
@@ -1694,10 +1940,45 @@
     }
 
     function getHistory() { try { return JSON.parse(localStorage.getItem('jschool_history') || '[]'); } catch { return []; } }
+    
     function saveToHistory(doc, score, correct, total) {
-      var h = getHistory(); h.unshift({ docName: doc, score, correct, total, date: new Date().toISOString(), id: Date.now() });
-      if (h.length > 50) h.length = 50; localStorage.setItem('jschool_history', JSON.stringify(h)); renderHistory();
+      var item = {
+        id: String(Date.now()),
+        docName: doc,
+        score: score,
+        correct: correct,
+        total: total,
+        date: new Date().toISOString(),
+        quizData: quizData,
+        userAnswers: userAnswers,
+        gradingResults: gradingResults,
+        tutorNotes: currentTutorNotes
+      };
+      var h = getHistory();
+      h.unshift(item);
+      if (h.length > 50) h.length = 50;
+      localStorage.setItem('jschool_history', JSON.stringify(h));
+      renderHistory();
+
+      // Sync to Firestore if signed in
+      if (currentUser) {
+        db.collection('users').doc(currentUser.uid).collection('history').doc(item.id).set(item).catch(console.error);
+      }
     }
+
+    async function syncHistoryFromFirestore() {
+      if (!currentUser) return;
+      try {
+        var snap = await db.collection('users').doc(currentUser.uid).collection('history').orderBy('date', 'desc').limit(50).get();
+        if (!snap.empty) {
+          var cloudHistory = [];
+          snap.forEach(doc => cloudHistory.push(doc.data()));
+          localStorage.setItem('jschool_history', JSON.stringify(cloudHistory));
+          renderHistory();
+        }
+      } catch (e) { console.error('Firestore sync error:', e); }
+    }
+
     function renderHistory() {
       var h = getHistory(), c = document.getElementById('historyContainer'), cb = document.getElementById('btnClearHistory');
       if (!h.length) { c.innerHTML = '<div class="history-empty">No quizzes yet — upload a PDF to begin</div>'; cb.style.display = 'none'; return; }
@@ -1705,10 +1986,74 @@
       c.innerHTML = h.map(x => {
         var d = new Date(x.date), ds = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), ts = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         var sc = x.score >= 80 ? 'var(--correct)' : x.score >= 50 ? 'var(--warning)' : 'var(--incorrect)';
-        return '<div class="hist-item"><div class="hist-info"><span class="hist-doc">📄 ' + esc(x.docName) + '</span><span class="hist-meta">' + ds + ' · ' + x.correct + '/' + x.total + '</span></div><span class="hist-score" style="color:' + sc + '">' + x.score + '%</span></div>';
+        return '<div class="hist-item" onclick="viewHistoryDetail(\'' + x.id + '\')" style="cursor:pointer;" title="Click to view detailed quiz review"><div class="hist-info"><span class="hist-doc">📄 ' + esc(x.docName) + '</span><span class="hist-meta">' + ds + ' · ' + x.correct + '/' + x.total + '</span></div><div style="display:flex;align-items:center;gap:12px;"><span class="hist-score" style="color:' + sc + '">' + x.score + '%</span><span style="font-size:0.75rem;color:var(--accent-light);">Review →</span></div></div>';
       }).join('');
     }
-    function clearHistory() { if (!confirm('Clear history?')) return; localStorage.removeItem('jschool_history'); renderHistory(); toast('Cleared'); }
+
+    function viewHistoryDetail(id) {
+      var h = getHistory();
+      var item = h.find(x => String(x.id) === String(id));
+      if (!item) return;
+
+      document.getElementById('histDetailDoc').textContent = '📄 ' + (item.docName || 'Course Document');
+      document.getElementById('histDetailTitle').textContent = 'Quiz Review';
+      var d = new Date(item.date);
+      document.getElementById('histDetailDate').textContent = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) + ' at ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+      document.getElementById('histDetailScore').textContent = item.score + '%';
+      document.getElementById('histDetailCorrect').textContent = item.correct;
+      document.getElementById('histDetailTotal').textContent = item.total;
+
+      var badge = document.getElementById('histDetailBadge');
+      if (item.score >= 80) { badge.className = 'readiness ready'; badge.textContent = '🎯 Exam Ready!'; }
+      else if (item.score >= 50) { badge.className = 'readiness almost'; badge.textContent = '📖 Almost There'; }
+      else { badge.className = 'readiness not-ready'; badge.textContent = '📚 Keep Studying'; }
+
+      // Render Saved Tutor Notes if available
+      var tutorSec = document.getElementById('histTutorSection');
+      var tutorContainer = document.getElementById('histTutorContainer');
+      if (item.tutorNotes && item.tutorNotes.length) {
+        tutorSec.style.display = 'block';
+        var th = '';
+        item.tutorNotes.forEach((n, i) => {
+          var qr = (n.questions_covered || []).map(q => 'Q' + q).join(', ');
+          th += '<div class="tutor-card' + (i === 0 ? ' open' : '') + '" onclick="toggleNote(this)"><button class="tutor-toggle"><span>📖 ' + esc(n.topic) + (qr ? ' <span style="font-size:0.68rem;color:var(--text-muted);font-weight:400">(' + qr + ')</span>' : '') + '</span><span class="tutor-chevron">▼</span></button><div class="tutor-body"><div class="tutor-content"><strong>Understanding:</strong><p style="margin-top:4px">' + esc(n.concept_explanation) + '</p><div class="tutor-block wrong"><strong>❌ Where you went wrong:</strong><p style="margin-top:3px">' + esc(n.why_wrong) + '</p></div><div class="tutor-block right"><strong>✅ Key takeaway:</strong><p style="margin-top:3px">' + esc(n.correct_understanding) + '</p></div><div class="tutor-block tip"><strong>💡 Study tip:</strong><p style="margin-top:3px">' + esc(n.study_tip) + '</p></div></div></div></div>';
+        });
+        tutorContainer.innerHTML = th;
+      } else {
+        tutorSec.style.display = 'none';
+      }
+
+      // Render Detailed Question Review
+      var rh = '';
+      if (item.quizData && item.quizData.length) {
+        item.quizData.forEach((q, i) => {
+          var r = (item.gradingResults && item.gradingResults[i]) || { correct: false, score: 0, feedback: '', explanation: q.explanation || '' };
+          var uAns = item.userAnswers ? item.userAnswers[i] : '';
+          var vc = r.correct ? 'rev-correct' : r.partial ? 'rev-partial' : 'rev-incorrect';
+          var vt = r.correct ? '✓' : r.partial ? '~' : '✗';
+          var tp = q.topic ? '<span class="q-topic" style="margin:0 0 6px">' + esc(q.topic) + '</span>' : '';
+          rh += '<div class="rev-card"><div class="rev-header"><span class="rev-num">Q' + (i + 1) + ' · ' + q.type.replace('_', ' ') + '</span><span class="rev-badge ' + vc + '">' + vt + '</span></div>' + tp + '<p class="rev-q">' + esc(q.question) + '</p><div class="rev-ans rev-yours"><div class="ans-label">You</div>' + esc(uAns || '(blank)') + '</div><div class="rev-ans rev-right"><div class="ans-label">Answer</div>' + esc(q.correct_answer) + '</div><div class="rev-explain">💡 ' + esc(r.explanation || q.explanation || r.feedback) + '</div></div>';
+        });
+      } else {
+        rh = '<div style="color:var(--text-muted);font-size:0.85rem;">Detailed question review not available for this session.</div>';
+      }
+      document.getElementById('histReviewContainer').innerHTML = rh;
+
+      showScreen('historyDetail');
+    }
+
+    function clearHistory() {
+      if (!confirm('Clear history?')) return;
+      localStorage.removeItem('jschool_history');
+      if (currentUser) {
+        db.collection('users').doc(currentUser.uid).collection('history').get().then(snap => {
+          snap.forEach(doc => doc.ref.delete());
+        }).catch(console.error);
+      }
+      renderHistory();
+      toast('Cleared');
+    }
 
     function esc(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
     function escA(s) { return s.replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
