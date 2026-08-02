@@ -664,14 +664,43 @@
 
     /* ── ChatGPT Style Ask Tutor ── */
     #screenAskTutor.screen {
-      position: absolute; inset: 0; z-index: 10;
-      padding: 0 !important; margin: 0 !important; max-width: 100% !important;
-      height: 100vh; display: flex; flex-direction: column; background: var(--bg-primary);
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1000;
+      padding: 0; margin: 0; width: 100vw; height: 100vh;
+      display: flex; flex-direction: column; background: var(--bg-primary);
     }
+    #screenAskTutor:not(.active) { display: none; }
+    
+    .chat-sidebar-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      z-index: 1010; opacity: 0; transition: opacity 0.3s ease;
+    }
+    .chat-sidebar-overlay.show { display: block; opacity: 1; }
+    
+    .chat-sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0; width: 280px;
+      background: var(--bg-surface); border-right: 1px solid var(--glass-border);
+      z-index: 1020; transform: translateX(-100%); transition: transform 0.3s ease;
+      display: flex; flex-direction: column;
+    }
+    .chat-sidebar.open { transform: translateX(0); }
+    .chat-sidebar-header {
+      padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .chat-sidebar-content {
+      flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .chat-hist-item {
+      padding: 12px; border-radius: var(--radius-sm); cursor: pointer;
+      color: var(--text-secondary); font-size: 0.85rem; transition: var(--transition);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 1px solid transparent;
+    }
+    .chat-hist-item:hover { background: var(--bg-card); color: var(--text-primary); }
+    .chat-hist-item.active { background: var(--bg-surface-2); border-color: var(--glass-border); color: var(--text-primary); }
+
     .ask-chat-container {
       display: flex; flex-direction: column; height: 100%; width: 100%;
-      padding: 0 !important; margin: 0 !important; border: none !important;
-      background: var(--bg-primary) !important; border-radius: 0 !important; overflow: hidden;
+      padding: 0; margin: 0; border: none; background: transparent;
     }
     .ask-header {
       padding: 14px 20px; border-bottom: 1px solid var(--glass-border);
@@ -779,6 +808,21 @@
   <div class="ambient-orb orb-1"></div>
   <div class="ambient-orb orb-2"></div>
   <div class="ambient-orb orb-3"></div>
+
+  <!-- Chat History Sidebar -->
+  <div class="chat-sidebar-overlay" id="chatSidebarOverlay" onclick="toggleChatSidebar()"></div>
+  <div class="chat-sidebar" id="chatSidebar">
+    <div class="chat-sidebar-header">
+      <h3 style="font-size: 1rem; font-weight: 600;">Chat History</h3>
+      <button style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.2rem;" onclick="toggleChatSidebar()">✕</button>
+    </div>
+    <div class="chat-sidebar-content" id="chatSidebarContent">
+      <div style="color:var(--text-muted); font-size:0.85rem; padding: 10px;">Current Session</div>
+    </div>
+    <div style="padding: 16px; border-top: 1px solid var(--glass-border);">
+      <button class="btn btn-ghost" style="width: 100%; justify-content: center;" onclick="toggleChatSidebar(); window.history.back();">← Back to App</button>
+    </div>
+  </div>
 
   <div class="layout-wrapper">
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -1012,9 +1056,11 @@
 
     <!-- HISTORY -->
     <section class="screen" id="screenHistory">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-        <h2 style="font-size:1.25rem; font-weight:800;">History</h2>
-        <button class="btn btn-ghost" onclick="showScreen('upload')">← Back</button>
+      <div style="display:flex;align-items:center; gap: 12px; margin-bottom:20px;">
+        <button class="ask-header-btn" onclick="window.history.back()" title="Back" style="width:36px; height:36px; background:var(--bg-card); flex-shrink:0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        </button>
+        <h2 style="font-size:1.25rem; font-weight:800; margin:0;">Quiz History</h2>
       </div>
       <div id="historyContainer"><div class="history-empty">No quizzes yet — upload a PDF to begin</div></div>
       <div style="text-align:center;margin-top:16px;">
@@ -1024,13 +1070,14 @@
 
     <!-- HISTORY DETAIL REVIEW -->
     <section class="screen" id="screenHistoryDetail">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
-        <div>
-          <span class="doc-badge" style="font-size:0.7rem;" id="histDetailDoc">—</span>
-          <h2 style="font-size:1.25rem;font-weight:800;margin-top:4px;" id="histDetailTitle">Quiz Review</h2>
-          <p style="font-size:0.75rem;color:var(--text-muted);" id="histDetailDate">—</p>
+      <div style="display:flex;align-items:center; gap: 12px; margin-bottom: 20px;">
+        <button class="ask-header-btn" onclick="window.history.back()" title="Back" style="width:36px; height:36px; background:var(--bg-card); flex-shrink:0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        </button>
+        <div style="min-width:0; flex:1;">
+          <h2 style="font-size:1.1rem;font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;" id="histDetailTitle">Quiz Review</h2>
+          <p style="font-size:0.75rem;color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;" id="histDetailDoc">—</p>
         </div>
-        <button class="btn btn-ghost" onclick="showScreen('history')">← Back to History</button>
       </div>
 
       <div class="results-hero" style="padding:10px 0 20px;">
@@ -1097,47 +1144,20 @@
     </section>
       <!-- ASK TUTOR PAGE (ChatGPT Minimal UI) -->
       <section class="screen" id="screenAskTutor">
-        <div class="ask-chat-container">
-          <div class="ask-header">
-            <button class="ask-header-btn" onclick="toggleSidebar()" title="Menu">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-            </button>
-
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span class="doc-badge" id="askDocBadge" style="padding:6px 14px; border-radius:20px; background:rgba(255,255,255,0.06); font-size:0.8rem; font-weight:600;"><span id="askDocName">JSchool AI</span></span>
-            </div>
-
-            <button class="ask-header-btn" onclick="clearChat()" title="New Chat">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
-            </button>
+        <div class="ask-header">
+          <button class="ask-header-btn" onclick="toggleSidebar()" title="Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div class="ask-title">
+            <h2>AI Tutor</h2>
           </div>
-
-          <div class="ask-messages" id="askMessages">
-            <div class="ask-empty" id="askEmptyState">
-              <div class="ask-welcome">
-                <div class="ask-center-orb"></div>
-                <h2>Meet your AI Tutor</h2>
-                <p>More natural conversations, powered by AI and your course material</p>
-                <div class="quick-prompts">
-                  <button class="prompt-chip" onclick="sendQuickPrompt('Explain the key concepts of this material')">Key Concepts</button>
-                  <button class="prompt-chip" onclick="sendQuickPrompt('Give me a quick summary of the main points')">Quick Summary</button>
-                  <button class="prompt-chip" onclick="sendQuickPrompt('What are some real-world applications of this topic?')">Real-World Examples</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="ask-input-wrapper">
-            <div class="ask-input-box">
-              <button style="background:none; border:none; color:var(--text-muted); cursor:pointer; padding:4px; display:flex;" onclick="showScreen('upload')" title="Upload PDF">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              </button>
-              <textarea id="askInput" placeholder="Ask JSchool…" rows="1" onkeydown="handleAskKeyDown(event)"></textarea>
-              <button class="ask-send-btn" id="askSendBtn" onclick="askQuestion()" title="Send message">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-              </button>
-            </div>
-          </div>
+          <div style="width:20px;"></div>
+        </div>
+        <div class="ask-chat-container" style="display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center; height:100%; padding-bottom:15vh;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🚧</div>
+          <h2>Tutor Feature is Coming Soon!</h2>
+          <p style="color: var(--text-muted); max-width: 300px; margin-top: 0.5rem; line-height:1.5;">We are working on making the AI Tutor smarter and more responsive. Stay tuned.</p>
+          <button class="btn btn-primary btn-lg" style="margin-top: 1.5rem;" onclick="showScreen('upload')">Return to Dashboard</button>
         </div>
       </section>
 
@@ -1164,22 +1184,85 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+    if (typeof pdfjsLib !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+    } else {
+      console.warn("PDF.js not loaded. PDF parsing disabled.");
+    }
 
     // ── Firebase Init ──
     const firebaseConfig = {
-      apiKey: "AIzaSyCmsBK_FaTVmP2dj6Yi8DAtgBPrs0-oUuo",
+      apiKey: "YOUR_FIREBASE_API_KEY",
       authDomain: "jschool-f8d4f.firebaseapp.com",
       projectId: "jschool-f8d4f",
       storageBucket: "jschool-f8d4f.firebasestorage.app",
       messagingSenderId: "1036663288837",
-      appId: "1:1036663288837:web:a66d52354bc7bb9330d86c",
-      measurementId: "G-1639WC2T1B"
+      appId: "1:1036663288837:web:a66d52354bc7bb9330d86c"
     };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+    let auth, db, googleProvider;
+    try {
+      if (firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY") {
+        firebase.initializeApp(firebaseConfig);
+        auth = firebase.auth();
+        db = firebase.firestore();
+        googleProvider = new firebase.auth.GoogleAuthProvider();
+      } else {
+        throw new Error("Missing API Key");
+      }
+    } catch(e) {
+      console.warn("Firebase not configured. Using local mock auth/db.", e);
+      // Mock auth
+      auth = {
+        onAuthStateChanged: (cb) => {
+          let u = localStorage.getItem('mock_user');
+          cb(u ? JSON.parse(u) : null);
+        },
+        signInWithEmailAndPassword: async (e, p) => {
+          let u = { uid: 'mock123', email: e, displayName: e.split('@')[0] };
+          localStorage.setItem('mock_user', JSON.stringify(u));
+          location.reload();
+          return { user: u };
+        },
+        createUserWithEmailAndPassword: async (e, p) => {
+          let u = { uid: 'mock123', email: e, displayName: e.split('@')[0] };
+          localStorage.setItem('mock_user', JSON.stringify(u));
+          location.reload();
+          return { user: u };
+        },
+        signInWithPopup: async () => {
+          let u = { uid: 'mock123', email: 'guest@google.com', displayName: 'Guest User' };
+          localStorage.setItem('mock_user', JSON.stringify(u));
+          location.reload();
+          return { user: u };
+        },
+        signOut: async () => {
+          localStorage.removeItem('mock_user');
+          location.reload();
+        }
+      };
+      // Mock db
+      db = {
+        collection: () => ({
+          doc: () => ({
+            set: async () => {},
+            get: async () => ({ exists: false, data: () => ({}) }),
+            collection: () => ({
+              doc: () => ({
+                set: async () => {},
+                get: async () => ({ exists: false, data: () => ({}) })
+              }),
+              orderBy: () => ({
+                limit: () => ({
+                  get: async () => ({ empty: true, forEach: () => {} })
+                })
+              })
+            })
+          })
+        })
+      };
+      googleProvider = {};
+    }
     var currentUser = null;
     var authMode = 'login';
 
@@ -1212,7 +1295,7 @@
             email: user.email || '',
             displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'Student'),
             photoURL: user.photoURL || '',
-            lastActive: firebase.firestore.FieldValue.serverTimestamp()
+            lastActive: new Date().toISOString()
           }, { merge: true }).catch(console.error);
 
           // If on auth screen, auto-advance to upload
@@ -1462,20 +1545,11 @@
         document.getElementById('apiKeyInput').value = localStorage.getItem('jschool_openrouter_key') || '';
       }
       
-      // Toggle full-bleed for Ask Tutor (hide global mobile-header)
-      var mh = document.querySelector('.mobile-header');
-      var ac = document.querySelector('.app-container');
-      if (id === 'askTutor') {
-        if (mh) mh.style.display = 'none';
-        if (ac) ac.style.padding = '0';
-      } else {
-        if (mh) mh.style.display = '';
-        if (ac) ac.style.padding = '';
-      }
-
-      // Close sidebar on mobile if open
+      // Close sidebars on mobile if open
       var sb = document.getElementById('sidebar'); if (sb) sb.classList.remove('open');
       var so = document.getElementById('sidebarOverlay'); if (so) so.classList.remove('show');
+      var csb = document.getElementById('chatSidebar'); if (csb) csb.classList.remove('open');
+      var cso = document.getElementById('chatSidebarOverlay'); if (cso) cso.classList.remove('show');
     }
 
     window.addEventListener('popstate', (e) => {
@@ -1486,6 +1560,13 @@
     function toggleSidebar() {
       var sb = document.getElementById('sidebar'); if (sb) sb.classList.toggle('open');
       var so = document.getElementById('sidebarOverlay'); if (so) so.classList.toggle('show');
+    }
+
+    function toggleChatSidebar() {
+      var sb = document.getElementById('chatSidebar');
+      var ov = document.getElementById('chatSidebarOverlay');
+      if(sb) sb.classList.toggle('open');
+      if(ov) ov.classList.toggle('show');
     }
 
     // ── Mode ──
@@ -1870,7 +1951,7 @@
       if (currentUser) {
         db.collection('users').doc(currentUser.uid).collection('chats').doc('session').set({
           history: askHistory,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          updatedAt: new Date().toISOString()
         }).catch(console.error);
       }
     }
@@ -1926,6 +2007,16 @@
       if (h) {
         msgs.innerHTML = h;
         var empty = document.getElementById('askEmptyState'); if (empty) empty.style.display = 'none';
+        
+        var sidebarContent = document.getElementById('chatSidebarContent');
+        if (sidebarContent) {
+          sidebarContent.innerHTML = '<div class="chat-hist-item active">Current Session (' + askHistory.length + ' msgs)</div>';
+        }
+      } else {
+        var sidebarContent = document.getElementById('chatSidebarContent');
+        if (sidebarContent) {
+          sidebarContent.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem; padding: 10px;">No previous chats yet.</div>';
+        }
       }
       msgs.scrollTop = msgs.scrollHeight;
     }
