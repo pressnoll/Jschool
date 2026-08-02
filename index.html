@@ -807,9 +807,25 @@
         <div class="progress-bar-track"><div class="progress-bar-fill" id="extractionBar"></div></div>
         <p class="progress-label" id="extractionLabel">Extracting…</p>
       </div>
-      <div id="resumeContainer" style="display:none; margin-top: 24px; text-align: center;">
-        <p style="color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem;">Or continue where you left off:</p>
-        <button class="btn btn-primary" onclick="resumeSession()">📄 Resume <span id="resumeFileName"></span></button>
+      <div id="resumeContainer" style="display:none; margin-top: 24px;">
+        <div class="card card-glow" style="border: 1px solid var(--accent-glow); background: linear-gradient(135deg, rgba(108,92,231,0.08), rgba(19,19,37,0.85)); padding: 20px 24px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <div style="width:44px; height:44px; border-radius:12px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-size:1.4rem; border:1px solid hsla(var(--accent-h),75%,60%,0.2);">⚡</div>
+              <div>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                  <h4 style="font-size:0.95rem; font-weight:700;" id="resumeTitle">Resume Active Session</h4>
+                  <span class="doc-badge" style="font-size:0.68rem; padding:3px 9px;">📄 <span id="resumeFileName">—</span></span>
+                </div>
+                <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:3px;" id="resumeSubtext">Session in progress</p>
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <button class="btn btn-primary btn-lg" onclick="resumeActiveSession()" style="padding:10px 22px;">▶ Continue</button>
+              <button class="btn btn-ghost" onclick="discardSessionAndNew()" style="font-size:0.82rem; padding:8px 12px; color:var(--text-muted);" title="Reset Session">🗑 Reset</button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1044,27 +1060,134 @@
     window.addEventListener('DOMContentLoaded', () => { 
       updateKeyStatus(); 
       renderHistory(); 
-      var savedName = localStorage.getItem('jschool_pdf_name');
-      var savedText = localStorage.getItem('jschool_pdf_text');
-      if (savedName && savedText) {
-        extractedText = savedText;
-        pdfFileName = savedName;
-        pdfLoaded = true;
-        document.getElementById('resumeContainer').style.display = 'block';
-        document.getElementById('resumeFileName').textContent = savedName;
-        document.getElementById('docName').textContent = savedName;
-        var adn = document.getElementById('askDocName'); if (adn) adn.textContent = savedName;
-      }
       loadChatHistory();
+      restoreActiveSession();
     });
 
-    function resumeSession() {
-      extractedText = localStorage.getItem('jschool_pdf_text');
-      pdfFileName = localStorage.getItem('jschool_pdf_name');
-      pdfLoaded = true;
-      document.getElementById('docName').textContent = pdfFileName;
-      var adn = document.getElementById('askDocName'); if (adn) adn.textContent = pdfFileName;
-      showScreen('config');
+    window.addEventListener('beforeunload', () => saveActiveSession());
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveActiveSession(); });
+
+    function saveActiveSession(screenId) {
+      if (!pdfLoaded) return;
+      var activeEl = document.querySelector('.screen.active');
+      var sid = screenId || (activeEl ? activeEl.id.replace('screen', '').toLowerCase() : 'upload');
+      var sessionData = {
+        pdfFileName: pdfFileName,
+        extractedText: extractedText,
+        studyMode: studyMode,
+        quizData: quizData,
+        userAnswers: userAnswers,
+        currentQ: currentQ,
+        flashcards: flashcards,
+        fcDeck: fcDeck,
+        fcCurrentIdx: fcCurrentIdx,
+        fcGotIt: fcGotIt,
+        fcStillLearning: fcStillLearning,
+        activeScreen: sid,
+        timestamp: Date.now()
+      };
+      localStorage.setItem('jschool_active_session', JSON.stringify(sessionData));
+    }
+
+    function clearActiveSession() {
+      localStorage.removeItem('jschool_active_session');
+    }
+
+    function restoreActiveSession() {
+      try {
+        var raw = localStorage.getItem('jschool_active_session');
+        var savedName = localStorage.getItem('jschool_pdf_name');
+        var savedText = localStorage.getItem('jschool_pdf_text');
+
+        if (raw) {
+          var s = JSON.parse(raw);
+          if (s && s.pdfFileName && s.extractedText) {
+            pdfFileName = s.pdfFileName;
+            extractedText = s.extractedText;
+            pdfLoaded = true;
+            studyMode = s.studyMode || 'quiz';
+            quizData = s.quizData || [];
+            userAnswers = s.userAnswers || [];
+            currentQ = s.currentQ || 0;
+            flashcards = s.flashcards || [];
+            fcDeck = s.fcDeck || [];
+            fcCurrentIdx = s.fcCurrentIdx || 0;
+            fcGotIt = s.fcGotIt || [];
+            fcStillLearning = s.fcStillLearning || [];
+
+            document.getElementById('docName').textContent = pdfFileName;
+            var adn = document.getElementById('askDocName'); if (adn) adn.textContent = pdfFileName;
+
+            updateResumeCardUI(s);
+
+            // AUTO-JUMP directly to question or flashcard if in progress!
+            if (s.activeScreen === 'quiz' && quizData.length > 0) {
+              showScreen('quiz');
+              renderQuestion();
+              return true;
+            } else if (s.activeScreen === 'flashcards' && flashcards.length > 0) {
+              showScreen('flashcards');
+              document.getElementById('fcActiveArea').style.display = 'block';
+              document.getElementById('fcCompleteArea').style.display = 'none';
+              renderFlashcard();
+              return true;
+            } else if (s.activeScreen === 'results') {
+              showResults();
+              return true;
+            } else if (s.activeScreen === 'asktutor') {
+              showScreen('askTutor');
+              return true;
+            }
+            return true;
+          }
+        }
+
+        if (savedName && savedText) {
+          extractedText = savedText;
+          pdfFileName = savedName;
+          pdfLoaded = true;
+          document.getElementById('docName').textContent = savedName;
+          var adn = document.getElementById('askDocName'); if (adn) adn.textContent = savedName;
+          updateResumeCardUI({});
+        }
+      } catch(e) { console.error(e); }
+      return false;
+    }
+
+    function updateResumeCardUI(s) {
+      var container = document.getElementById('resumeContainer');
+      if (!container) return;
+      container.style.display = 'block';
+      document.getElementById('resumeFileName').textContent = pdfFileName || 'Course PDF';
+
+      var subtext = 'PDF loaded and ready';
+      if (s.studyMode === 'quiz' && s.quizData && s.quizData.length > 0) {
+        subtext = 'Quiz in progress: Question ' + (s.currentQ + 1) + ' of ' + s.quizData.length;
+      } else if (s.studyMode === 'flashcard' && s.flashcards && s.flashcards.length > 0) {
+        subtext = 'Flashcards in progress: Card ' + (s.fcCurrentIdx + 1) + ' of ' + (s.fcDeck ? s.fcDeck.length : s.flashcards.length);
+      }
+      document.getElementById('resumeSubtext').textContent = subtext;
+    }
+
+    function resumeActiveSession() {
+      if (studyMode === 'quiz' && quizData.length > 0) {
+        showScreen('quiz');
+        renderQuestion();
+      } else if (studyMode === 'flashcard' && flashcards.length > 0) {
+        showScreen('flashcards');
+        document.getElementById('fcActiveArea').style.display = 'block';
+        document.getElementById('fcCompleteArea').style.display = 'none';
+        renderFlashcard();
+      } else {
+        showScreen('config');
+      }
+    }
+
+    function discardSessionAndNew() {
+      if (confirm('Start fresh session? This will clear your current question progress.')) {
+        clearActiveSession();
+        newQuiz();
+      }
     }
 
     // ── Screens ──
@@ -1248,6 +1371,7 @@
         if (pastTopics.length > 30) pastTopics = pastTopics.slice(pastTopics.length - 30);
         localStorage.setItem('jschool_past_topics', JSON.stringify(pastTopics));
         showScreen('quiz'); renderQuestion();
+        saveActiveSession('quiz');
       } catch (err) { console.error(err); showScreen('config'); toast('Failed: ' + err.message, true); }
     }
 
@@ -1273,6 +1397,7 @@
         document.getElementById('fcActiveArea').style.display = 'block';
         document.getElementById('fcCompleteArea').style.display = 'none';
         renderFlashcard();
+        saveActiveSession('flashcards');
       } catch (err) { console.error(err); showScreen('config'); toast('Failed: ' + err.message, true); }
     }
 
@@ -1299,9 +1424,10 @@
     function markCard(got) {
       (got ? fcGotIt : fcStillLearning).push(fcDeck[fcCurrentIdx]);
       fcDeck.splice(fcCurrentIdx, 1);
-      if (!fcDeck.length) { showFcComplete(); return; }
+      if (!fcDeck.length) { showFcComplete(); saveActiveSession('flashcards'); return; }
       if (fcCurrentIdx >= fcDeck.length) fcCurrentIdx = 0;
       renderFlashcard();
+      saveActiveSession('flashcards');
     }
     function showFcComplete() {
       document.getElementById('fcActiveArea').style.display = 'none';
@@ -1340,16 +1466,16 @@
         });
         h += '</div>';
       } else {
-        h += '<textarea class="sa-input" placeholder="Your answer…" oninput="userAnswers[' + currentQ + ']=this.value">' + (userAnswers[currentQ] || '') + '</textarea>';
+        h += '<textarea class="sa-input" placeholder="Your answer…" oninput="userAnswers[currentQ]=this.value; saveActiveSession(\'quiz\');">' + (userAnswers[currentQ] || '') + '</textarea>';
       }
       document.getElementById('questionContainer').innerHTML = h;
       document.getElementById('btnPrev').style.visibility = currentQ === 0 ? 'hidden' : 'visible';
       document.getElementById('btnNext').textContent = currentQ === n - 1 ? '✓ Submit' : 'Next →';
     }
-    function selectMcOption(qi, v) { userAnswers[qi] = v; renderQuestion(); }
+    function selectMcOption(qi, v) { userAnswers[qi] = v; renderQuestion(); saveActiveSession('quiz'); }
     function navQuestion(d) {
       if (d === 1 && currentQ === quizData.length - 1) { finishQuiz(); return; }
-      currentQ = Math.max(0, Math.min(quizData.length - 1, currentQ + d)); renderQuestion();
+      currentQ = Math.max(0, Math.min(quizData.length - 1, currentQ + d)); renderQuestion(); saveActiveSession('quiz');
     }
 
     // ── Grade ──
@@ -1559,8 +1685,9 @@
     function newQuiz() {
       extractedText = ''; pdfFileName = ''; quizData = []; userAnswers = []; currentQ = 0; gradingResults = [];
       flashcards = []; fcDeck = []; fcGotIt = []; fcStillLearning = []; pdfLoaded = false; askHistory = [];
-      var adn = document.getElementById('askDocName'); if (adn) adn.textContent = 'No PDF loaded';
-      document.getElementById('askMessages').innerHTML = '<div class="ask-empty">Ask anything about your material — definitions, explanations, examples…</div>';
+      clearActiveSession();
+      var adn = document.getElementById('askDocName'); if (adn) adn.textContent = 'General Mode (No PDF)';
+      document.getElementById('askMessages').innerHTML = '<div class="ask-empty" id="askEmptyState"><div class="ask-welcome"><div class="welcome-icon">💬</div><h3>Ask Your AI Tutor Anything</h3><p>Ground answers in your course PDF or ask any general academic questions!</p><div class="quick-prompts"><button class="prompt-chip" onclick="sendQuickPrompt(\'Explain the key concepts of this material\')">💡 Key Concepts</button><button class="prompt-chip" onclick="sendQuickPrompt(\'Give me a quick summary of the main points\')">📝 Quick Summary</button><button class="prompt-chip" onclick="sendQuickPrompt(\'What are some real-world applications of this topic?\')">🌐 Real-World Examples</button></div></div></div>';
       document.getElementById('fileInfo').classList.remove('show');
       document.getElementById('extractionProgress').classList.remove('show');
       document.getElementById('fileInput').value = ''; showScreen('upload');
