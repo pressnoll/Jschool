@@ -1863,18 +1863,29 @@
           gradingResults[i] = { correct: c, score: c ? 1 : 0, feedback: c ? 'Correct!' : 'Answer: ' + q.correct_answer, explanation: q.explanation || '' };
         }
       });
-      if (saIdx.length > 0 && apiKey) {
-        try {
-          var items = saIdx.map(i => ({ id: i + 1, question: quizData[i].question, correct_answer: quizData[i].correct_answer, user_answer: userAnswers[i] || '(blank)' }));
-          var gp = 'Grade these exam answers fairly. Accept equivalent meanings. ONLY JSON array:\n[{"id":1,"score":0.0,"correct":false,"feedback":"..."}]\nScore: 1.0=correct, 0.5=partial, 0.0=wrong.\n\n' + JSON.stringify(items, null, 2);
-          var gr = await callOpenRouter(apiKey, gp), gs = parseJson(gr);
-          (Array.isArray(gs) ? gs : []).forEach(g => {
-            var idx = g.id - 1;
-            gradingResults[idx] = { correct: g.score >= 0.7, partial: g.score >= 0.3 && g.score < 0.7, score: g.score, feedback: g.feedback, explanation: quizData[idx].explanation || '' };
+      if (saIdx.length > 0) {
+        var fallbackGrading = () => {
+          saIdx.forEach(i => {
+            var u = (userAnswers[i] || '').trim().toLowerCase(), c = (quizData[i].correct_answer || '').trim().toLowerCase();
+            var ok = u === c || c.includes(u);
+            gradingResults[i] = { correct: ok, score: ok ? 1 : 0, feedback: ok ? 'Correct!' : 'Incorrect.', explanation: quizData[i].explanation || '' };
           });
-        } catch (e) {
-          console.error(e);
-          saIdx.forEach(i => { var u = (userAnswers[i] || '').trim().toLowerCase(), c = (quizData[i].correct_answer || '').trim().toLowerCase(); var ok = u === c || c.includes(u); gradingResults[i] = { correct: ok, score: ok ? 1 : 0, feedback: ok ? 'Correct!' : 'Incorrect.', explanation: quizData[i].explanation || '' }; });
+        };
+        if (apiKey) {
+          try {
+            var items = saIdx.map(i => ({ id: i + 1, question: quizData[i].question, correct_answer: quizData[i].correct_answer, user_answer: userAnswers[i] || '(blank)' }));
+            var gp = 'Grade these exam answers fairly. Accept equivalent meanings. ONLY JSON array:\n[{"id":1,"score":0.0,"correct":false,"feedback":"..."}]\nScore: 1.0=correct, 0.5=partial, 0.0=wrong.\n\n' + JSON.stringify(items, null, 2);
+            var gr = await callOpenRouter(apiKey, gp), gs = parseJson(gr);
+            (Array.isArray(gs) ? gs : []).forEach(g => {
+              var idx = g.id - 1;
+              gradingResults[idx] = { correct: g.score >= 0.7, partial: g.score >= 0.3 && g.score < 0.7, score: g.score, feedback: g.feedback, explanation: quizData[idx].explanation || '' };
+            });
+          } catch (e) {
+            console.error(e);
+            fallbackGrading();
+          }
+        } else {
+          fallbackGrading();
         }
       }
       quizData.forEach((q, i) => { if (!gradingResults[i]) gradingResults[i] = { correct: false, score: 0, feedback: 'Not answered.', explanation: q.explanation || '' }; });
@@ -1996,6 +2007,8 @@
     
     function renderChatHistory() {
       var msgs = document.getElementById('askMessages');
+      if (!msgs) return; // Prevent crash if Tutor UI is disabled
+      
       var h = '';
       askHistory.forEach(m => {
         if (m.role === 'user') {
