@@ -1375,6 +1375,7 @@
             extractedText = s.extractedText;
             pdfLoaded = true;
             studyMode = s.studyMode || 'quiz';
+            selectMode(studyMode); // Sync UI with saved mode
             quizData = s.quizData || [];
             userAnswers = s.userAnswers || [];
             currentQ = s.currentQ || 0;
@@ -1680,7 +1681,7 @@
       var pastTopics = []; try { pastTopics = JSON.parse(localStorage.getItem('jschool_past_topics') || '[]'); } catch(e){}
       var avoidI = pastTopics.length && !focus ? '\nVARIETY: Avoid these recently tested topics if possible: ' + pastTopics.join(', ') + '. Pick NEW areas.' : '';
       var src = getSourceText(25000), focusI = focus ? '\nFOCUS: "' + focus + '".' : avoidI;
-      var prompt = 'You are a tutor creating study flashcards from this material.\n\nDOCUMENT:\n"""\n' + src + '\n"""\n\nCreate exactly ' + num + ' flashcards.' + focusI + '\nEach has front (question/concept), back (thorough 2-4 sentence answer), and topic (2-5 words).\nALL from document only. ONLY valid JSON:\n\n{"flashcards":[{"front":"...","back":"...","topic":"..."}]}';
+      var prompt = 'You are a tutor creating study flashcards from this material.\n\nDOCUMENT:\n"""\n' + src + '\n"""\n\nCRITICAL: You MUST create EXACTLY ' + num + ' flashcards. Do not stop early, do not generate fewer than ' + num + ' cards. ' + focusI + '\nEach has front (question/concept), back (thorough 2-4 sentence answer), and topic (2-5 words).\nALL from document only. ONLY valid JSON:\n\n{"flashcards":[{"front":"...","back":"...","topic":"..."}]}';
       try {
         var r = await callOpenRouter(apiKey, prompt), p = parseJson(r);
         if (!p?.flashcards?.length) throw new Error('No flashcards generated');
@@ -2043,6 +2044,7 @@
       extractedText = ''; pdfFileName = ''; quizData = []; userAnswers = []; currentQ = 0; gradingResults = [];
       flashcards = []; fcDeck = []; fcGotIt = []; fcStillLearning = []; pdfLoaded = false; askHistory = [];
       clearActiveSession();
+      selectMode('quiz'); // Reset to quiz mode
       var adn = document.getElementById('askDocName'); if (adn) adn.textContent = 'General Mode (No PDF)';
       document.getElementById('askMessages').innerHTML = '<div class="ask-empty" id="askEmptyState"><div class="ask-welcome"><div class="welcome-icon">💬</div><h3>Ask Your AI Tutor Anything</h3><p>Ground answers in your course PDF or ask any general academic questions!</p><div class="quick-prompts"><button class="prompt-chip" onclick="sendQuickPrompt(\'Explain the key concepts of this material\')">💡 Key Concepts</button><button class="prompt-chip" onclick="sendQuickPrompt(\'Give me a quick summary of the main points\')">📝 Quick Summary</button><button class="prompt-chip" onclick="sendQuickPrompt(\'What are some real-world applications of this topic?\')">🌐 Real-World Examples</button></div></div></div>';
       document.getElementById('fileInfo').classList.remove('show');
