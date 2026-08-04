@@ -1212,33 +1212,34 @@
       }
     } catch(e) {
       console.warn("Firebase not configured. Using local mock auth/db.", e);
-      // Mock auth
+      let authCallbacks = [];
       auth = {
         onAuthStateChanged: (cb) => {
+          authCallbacks.push(cb);
           let u = localStorage.getItem('mock_user');
           cb(u ? JSON.parse(u) : null);
         },
         signInWithEmailAndPassword: async (e, p) => {
           let u = { uid: 'mock123', email: e, displayName: e.split('@')[0] };
           localStorage.setItem('mock_user', JSON.stringify(u));
-          location.reload();
+          authCallbacks.forEach(cb => cb(u));
           return { user: u };
         },
         createUserWithEmailAndPassword: async (e, p) => {
           let u = { uid: 'mock123', email: e, displayName: e.split('@')[0] };
           localStorage.setItem('mock_user', JSON.stringify(u));
-          location.reload();
+          authCallbacks.forEach(cb => cb(u));
           return { user: u };
         },
         signInWithPopup: async () => {
           let u = { uid: 'mock123', email: 'guest@google.com', displayName: 'Guest User' };
           localStorage.setItem('mock_user', JSON.stringify(u));
-          location.reload();
+          authCallbacks.forEach(cb => cb(u));
           return { user: u };
         },
         signOut: async () => {
           localStorage.removeItem('mock_user');
-          location.reload();
+          authCallbacks.forEach(cb => cb(null));
         }
       };
       // Mock db
