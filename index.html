@@ -1661,6 +1661,16 @@
       try {
         var r = await callOpenRouter(apiKey, prompt), p = parseJson(r);
         if (!p?.questions?.length) throw new Error('No questions generated');
+        p.questions.forEach(q => {
+          if (q.type) {
+            var t = String(q.type).toLowerCase().replace(/\s+/g, '_');
+            if (t.includes('multiple')) q.type = 'multiple_choice';
+            else if (t.includes('true') || t.includes('false')) q.type = 'true_false';
+            else q.type = 'short_answer';
+          } else {
+            q.type = 'short_answer';
+          }
+        });
         quizData = p.questions; userAnswers = new Array(quizData.length).fill(null); currentQ = 0;
         // Save topics for variety next time
         p.questions.forEach(q => { if (q.topic && !pastTopics.includes(q.topic)) pastTopics.push(q.topic); });
