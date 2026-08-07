@@ -908,13 +908,13 @@
     <section class="screen active" id="screenUpload">
       <div class="upload-hero">
         <h1>Your AI Study Partner</h1>
-        <p>Drop a course PDF and let your personal tutor create quizzes, flashcards, and answer your questions</p>
+        <p>Drop a course PDF, Word, or PPTX file and let your personal tutor create quizzes, flashcards, and answer your questions</p>
       </div>
       <div class="drop-zone" id="dropZone">
         <span class="drop-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 12 15 15"></polyline></svg></span>
-        <h3>Drop your PDF here</h3>
-        <p>or click to browse</p>
-        <input type="file" accept=".pdf,application/pdf" id="fileInput" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
+        <h3>Drop your Document here</h3>
+        <p>or click to browse (PDF, DOCX, PPTX)</p>
+        <input type="file" accept=".pdf,application/pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" id="fileInput" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
       </div>
       <div class="file-info" id="fileInfo">
         <span class="file-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg></span>
@@ -1223,6 +1223,8 @@
   <div class="toast" id="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -1615,12 +1617,12 @@
     dropZone.addEventListener('drop', e => {
       e.preventDefault(); dropZone.classList.remove('drag-over');
       var f = e.dataTransfer.files[0];
-      if (f && (f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'))) handleFile(f);
-      else toast('Drop a PDF file', true);
+      if (f && (f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf') || f.name.toLowerCase().endsWith('.docx') || f.name.toLowerCase().endsWith('.pptx'))) handleFile(f);
+      else toast('Drop a PDF, Word, or PPTX file', true);
     });
     fileInput.addEventListener('change', e => {
       var f = e.target.files[0];
-      if (f && (f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'))) handleFile(f);
+      if (f && (f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf') || f.name.toLowerCase().endsWith('.docx') || f.name.toLowerCase().endsWith('.pptx'))) handleFile(f);
     });
 
     async function handleFile(file) {
@@ -1630,21 +1632,54 @@
       var fileInfoEl = document.getElementById('fileInfo'), progressEl = document.getElementById('extractionProgress');
       var barEl = document.getElementById('extractionBar'), labelEl = document.getElementById('extractionLabel');
       fileInfoEl.classList.add('show'); progressEl.classList.add('show'); barEl.style.width = '0%';
+      
       try {
         var ab = await file.arrayBuffer();
-        var pdf = await pdfjsLib.getDocument({ data: ab }).promise;
-        var n = pdf.numPages;
-        document.getElementById('filePages').textContent = n + ' pages · ' + (file.size / 1024).toFixed(0) + ' KB';
         var allText = '';
-        for (var i = 1; i <= n; i++) {
-          var page = await pdf.getPage(i);
-          var content = await page.getTextContent();
-          allText += '\n--- Page ' + i + ' ---\n' + content.items.map(x => x.str).join(' ');
-          barEl.style.width = Math.round((i / n) * 100) + '%';
-          labelEl.textContent = 'Extracting… ' + i + '/' + n;
+        var ext = file.name.split('.').pop().toLowerCase();
+        
+        if (ext === 'docx') {
+          labelEl.textContent = 'Reading Word Document...';
+          if (typeof mammoth === 'undefined') throw new Error("Mammoth library not loaded");
+          var result = await mammoth.extractRawText({ arrayBuffer: ab });
+          allText = result.value;
+          document.getElementById('filePages').textContent = 'Word Document • ' + (file.size / 1024).toFixed(0) + ' KB';
+          barEl.style.width = '100%';
+        } else if (ext === 'pptx') {
+          labelEl.textContent = 'Reading PowerPoint...';
+          if (typeof JSZip === 'undefined') throw new Error("JSZip library not loaded");
+          var zip = await JSZip.loadAsync(ab);
+          var slideFiles = [];
+          zip.folder("ppt/slides").forEach(function (relativePath, f) {
+             if (relativePath.endsWith(".xml")) slideFiles.push(f);
+          });
+          document.getElementById('filePages').textContent = slideFiles.length + ' slides • ' + (file.size / 1024).toFixed(0) + ' KB';
+          for (var i = 0; i < slideFiles.length; i++) {
+             var slideXml = await slideFiles[i].async("string");
+             var matches = slideXml.match(/<a:t>([\s\S]*?)<\/a:t>/g);
+             if (matches) {
+               allText += '\n--- Slide ' + (i+1) + ' ---\n';
+               allText += matches.map(m => m.replace(/<\/?a:t>/g, '')).join(' ');
+             }
+             barEl.style.width = Math.round(((i+1) / slideFiles.length) * 100) + '%';
+             labelEl.textContent = 'Extracting... ' + (i+1) + '/' + slideFiles.length;
+          }
+        } else {
+          // Default PDF
+          var pdf = await pdfjsLib.getDocument({ data: ab }).promise;
+          var n = pdf.numPages;
+          document.getElementById('filePages').textContent = n + ' pages • ' + (file.size / 1024).toFixed(0) + ' KB';
+          for (var i = 1; i <= n; i++) {
+            var page = await pdf.getPage(i);
+            var content = await page.getTextContent();
+            allText += '\n--- Page ' + i + ' ---\n' + content.items.map(x => x.str).join(' ');
+            barEl.style.width = Math.round((i / n) * 100) + '%';
+            labelEl.textContent = 'Extracting... ' + i + '/' + n;
+          }
         }
+
         extractedText = allText.trim();
-        if (extractedText.length < 50) { toast('Not enough text — may be scanned', true); progressEl.classList.remove('show'); return; }
+        if (extractedText.length < 50) { toast('Not enough text — may be scanned or empty', true); progressEl.classList.remove('show'); return; }
         labelEl.textContent = '✓ ' + extractedText.length.toLocaleString() + ' chars';
         barEl.style.width = '100%';
         pdfLoaded = true;
